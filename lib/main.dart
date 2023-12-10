@@ -1,4 +1,9 @@
 import 'dart:io';
+import 'package:caption_forge/Ads/app_open_ad.dart';
+import 'package:caption_forge/Ads/banner_ad.dart';
+import 'package:caption_forge/Ads/interstitial_ad.dart';
+import 'package:caption_forge/Ads/native_ad.dart';
+import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,23 +13,33 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+  loadOpenAppAd();
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(),
-      theme: ThemeData.dark().copyWith(platform: TargetPlatform.iOS),
-    );
+        home: const MyHomePage(),
+        theme: ThemeData.dark().copyWith(
+            platform: Theme.of(context).platform == TargetPlatform.android
+                ? TargetPlatform.iOS
+                : Theme.of(context).platform));
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -33,6 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   PlatformFile? videoFile;
   TextEditingController urlController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    loadInterstitialAd();
+    loadRewardAd();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +124,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   )
                 : Container(),
+            BannerAdWidget(),
+            ElevatedButton(
+              onPressed: () {
+                interstitialAd!.show();
+              },
+              child: const Text('Show interstitialAd Ad'),
+            ),
+            NativeAdWidget(),
+            ElevatedButton(
+              onPressed: () {
+                rewardedAd!.show(
+                  onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+                    debugPrint(
+                        '$RewardedAd with reward $RewardItem(${reward.amount}, ${reward.type})');
+                  },
+                );
+              },
+              child: const Text('Show Rewarded Ad'),
+            ),
           ],
         ),
       ),
@@ -126,13 +166,13 @@ class _MyHomePageState extends State<MyHomePage> {
     final tempAudioPath =
         '${directory.path}/${videoFile!.name + UniqueKey().toString()}.m4a';
 
-    print('Video file: ${videoFile!.path}');
+    debugPrint('Video file: ${videoFile!.path}');
     await _convertVideoToAudio(videoFile!.path!, tempAudioPath);
 
-    print('Audio file converted: $tempAudioPath');
+    debugPrint('Audio file converted: $tempAudioPath');
 
     // var srtData = await _sendAudioToOpenAI(tempAudioPath);
-    // print(srtData);
+    // debugPrint(srtData);
     // return srtData;
     return """
 1
@@ -160,16 +200,16 @@ for your loss.
   }
 
   Future<void> _convertVideoToAudio(String inputPath, String outputPath) async {
-    print('Converting video to audio...');
+    debugPrint('Converting video to audio...');
     String command =
         '-i $inputPath -vn -ar 44100 -ac 2 -c:a aac -b:a 192k $outputPath';
 
     int result = await _flutterFFmpeg.execute(command);
 
     if (result == 0) {
-      print('Conversion successful');
+      debugPrint('Conversion successful');
     } else {
-      print('Conversion failed');
+      debugPrint('Conversion failed');
     }
   }
 
@@ -177,7 +217,7 @@ for your loss.
     final openaiApiKey = dotenv.env['OPENAI_API_KEY'];
 
     if (openaiApiKey == null || openaiApiKey.isEmpty) {
-      print('OpenAI API key is missing');
+      debugPrint('OpenAI API key is missing');
       return null;
     }
 
@@ -190,15 +230,15 @@ for your loss.
     try {
       final response = await request.send();
       if (response.statusCode == 200) {
-        print('Audio file sent successfully to OpenAI API');
+        debugPrint('Audio file sent successfully to OpenAI API');
         var responseData = await http.Response.fromStream(response);
-        print(responseData.body);
+        debugPrint(responseData.body);
         return responseData.body;
       } else {
-        print('Failed to send audio file. Status code: ${response.statusCode}');
+        debugPrint('Failed to send audio file. Status code: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error sending audio file: $error');
+      debugPrint('Error sending audio file: $error');
       return null;
     }
   }
@@ -225,12 +265,12 @@ for your loss.
           );
         });
 
-        print('Video downloaded and saved: $videoFilePath');
+        debugPrint('Video downloaded and saved: $videoFilePath');
       } else {
-        print('Failed to download video. Status code: ${response.statusCode}');
+        debugPrint('Failed to download video. Status code: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error downloading video: $error');
+      debugPrint('Error downloading video: $error');
     }
   }
 }
