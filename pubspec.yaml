@@ -45,7 +45,7 @@ dependencies:
   chewie: ^1.7.4
   video_player: ^2.8.1
   path: ^1.8.3
-  rename: ^3.0.1
+  # rename: ^3.0.1
 
 dev_dependencies:
   flutter_test:

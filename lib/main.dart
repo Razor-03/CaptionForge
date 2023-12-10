@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -42,64 +40,71 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Video to Audio Converter'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
-              controller: urlController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Paste video URL here',
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+              child: TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Video URL",
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(255, 227, 227, 227)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 16,
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 16,
+              ),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _downloadVideoFromUrl(urlController.text);
+                },
+                child: const Text('Upload From URL'),
+              ),
             ),
-            child: ElevatedButton(
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 16,
+              ),
+              child: Text('OR'),
+            ),
+            ElevatedButton(
               onPressed: () async {
-                await _downloadVideoFromUrl(urlController.text);
+                await _pickVideo();
               },
-              child: Text('Upload From URL'),
+              child: const Text('Upload From Device'),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 16,
-            ),
-            child: Text('OR'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await _pickVideo();
-            },
-            child: const Text('Upload From Device'),
-          ),
-          videoFile != null
-              ? FutureBuilder(
-                  key: UniqueKey(),
-                  future: _convertVideoToSrt(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return VideoPlayerView(
-                        key: UniqueKey(),
-                        url: videoFile!.path!,
-                        dataSourceType: DataSourceType.file,
-                        subtitleData: snapshot.data.toString(),
-                      );
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
-                )
-              : Container(),
-        ],
+            videoFile != null
+                ? FutureBuilder(
+                    key: UniqueKey(),
+                    future: _convertVideoToSrt(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return VideoPlayerView(
+                          key: UniqueKey(),
+                          url: videoFile!.path!,
+                          dataSourceType: DataSourceType.file,
+                          subtitleData: snapshot.data.toString(),
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+                    },
+                  )
+                : Container(),
+          ],
+        ),
       ),
     );
   }
@@ -119,18 +124,43 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<String> _convertVideoToSrt() async {
     final directory = await getTemporaryDirectory();
     final tempAudioPath =
-        '${directory.path}/${videoFile!.name + Random().nextInt(500).toString()}.m4a';
+        '${directory.path}/${videoFile!.name + UniqueKey().toString()}.m4a';
 
+    print('Video file: ${videoFile!.path}');
     await _convertVideoToAudio(videoFile!.path!, tempAudioPath);
 
     print('Audio file converted: $tempAudioPath');
 
-    var srtData = await _sendAudioToOpenAI(tempAudioPath);
-    print(srtData);
-    return srtData;
+    // var srtData = await _sendAudioToOpenAI(tempAudioPath);
+    // print(srtData);
+    // return srtData;
+    return """
+1
+00:00:00,000 --> 00:00:02,000
+Cognac?
+
+2
+00:00:02,000 --> 00:00:04,000
+No, thank you.
+
+3
+00:00:04,000 --> 00:00:06,000
+Listen, I'm...
+
+4
+00:00:06,000 --> 00:00:08,000
+sorry...
+
+5
+00:00:08,000 --> 00:00:10,000
+for your loss.
+
+
+""";
   }
 
   Future<void> _convertVideoToAudio(String inputPath, String outputPath) async {
+    print('Converting video to audio...');
     String command =
         '-i $inputPath -vn -ar 44100 -ac 2 -c:a aac -b:a 192k $outputPath';
 

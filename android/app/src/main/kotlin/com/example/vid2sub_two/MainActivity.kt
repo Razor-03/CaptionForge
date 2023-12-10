@@ -1,4 +1,4 @@
-package com.example.caption_forge_two
+package com.example.caption_forge
 
 import io.flutter.embedding.android.FlutterActivity
 
