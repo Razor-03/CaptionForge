@@ -4,20 +4,19 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-
 class VideoPlayerView extends StatefulWidget {
-  const VideoPlayerView({
+  VideoPlayerView({
     super.key,
     required this.url,
     required this.dataSourceType,
-    required this.subtitleData,
+    this.subtitleData,
   });
 
   final String url;
 
   final DataSourceType dataSourceType;
 
-  final String subtitleData;	
+  String? subtitleData;
 
   @override
   State<VideoPlayerView> createState() => _VideoPlayerViewState();
@@ -55,7 +54,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
               videoPlayerController: _videoPlayerController,
               // aspectRatio: 16 / 9,
               zoomAndPan: true,
-              subtitle: Subtitles(parseSRT(widget.subtitleData)),
+              subtitle: widget.subtitleData != null
+                  ? Subtitles(parseSRT(widget.subtitleData!))
+                  : null,
             ),
           ),
         );
@@ -86,15 +87,10 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   List<Subtitle> parseSRT(String srtData) {
     List<Subtitle> subtitles = [];
-
-    // Split the SRT data into individual subtitle blocks
     List<String> blocks = srtData.split('\n\n');
 
     for (String block in blocks) {
-      // Split each block into lines
       List<String> lines = block.split('\n');
-
-      // Extract index, start time, end time, and text from lines
       if (lines.length >= 3) {
         int index = int.tryParse(lines[0]) ?? 0;
 
@@ -110,12 +106,17 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
           String text = lines.sublist(2).join('\n').trim();
 
-          subtitles
-              .add(Subtitle(index: index, start: start, end: end, text: text));
+          subtitles.add(
+            Subtitle(
+              index: index,
+              start: start,
+              end: end,
+              text: text,
+            ),
+          );
         }
       }
     }
-
     return subtitles;
   }
 
