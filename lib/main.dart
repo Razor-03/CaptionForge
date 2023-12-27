@@ -1,6 +1,12 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
-import 'dart:math';
+import 'package:caption_forge/Ads/app_open_ad.dart';
+import 'package:caption_forge/Ads/banner_ad.dart';
+import 'package:caption_forge/Ads/interstitial_ad.dart';
+import 'package:caption_forge/Ads/native_ad.dart';
+import 'package:caption_forge/Ads/reward_ad.dart';
+import 'package:caption_forge/lang.dart';
+import 'package:circular_seek_bar/circular_seek_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,178 +16,270 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:caption_forge/screens/device_video.dart';
+import 'package:caption_forge/screens/url_video.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+  // loadOpenAppAd();
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(),
-      theme: ThemeData.dark().copyWith(platform: TargetPlatform.iOS),
-    );
+        home: const MyHomePage(),
+        theme: ThemeData.dark().copyWith(
+            platform: Theme.of(context).platform == TargetPlatform.android
+                ? TargetPlatform.iOS
+                : Theme.of(context).platform));
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   PlatformFile? videoFile;
   TextEditingController urlController = TextEditingController();
+  var client = http.Client();
+  // late Completer<void> _completer;
 
+  @override
+  void initState() {
+    super.initState();
+    // waiting();
+    // _completer = Completer<void>();
+
+    // loadInterstitialAd();
+    // loadRewardAd();
+  }
+
+  // Future<int> waiting() async {
+  //   await Future.delayed(const Duration(seconds: 5));
+  //   setState(() {
+  //     _progress = 50;
+  //     _valueNotifier.value = 50;
+  //   });
+  //   await Future.delayed(const Duration(seconds: 5));
+  //   setState(() {
+  //     _progress = 80;
+  //     _valueNotifier.value = 80;
+  //   });
+  //   return await Future.delayed(const Duration(seconds: 50));
+  // }
+
+  // void setProgress(double progress) {
+  //   setState(() {
+  //     _progress = progress;
+  //   });
+  // }
+
+  // void setProgress1(double progress) {
+  //   setState(() {
+  //     _progress = progress;
+  //   });
+  // }
+
+  // final ValueNotifier<double> _valueNotifier = ValueNotifier(0);
+  // var _progress = 0.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Video to Audio Converter'),
+        title: const Text('CaptionForge'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
-              controller: urlController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Paste video URL here',
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            // CircularSeekBar(
+            //   key: ValueKey(_progress),
+            //   width: double.infinity,
+            //   height: 250,
+            //   progress: _progress,
+            //   barWidth: 8,
+            //   startAngle: 45,
+            //   sweepAngle: 270,
+            //   strokeCap: StrokeCap.butt,
+            //   progressGradientColors: const [
+            //     Colors.red,
+            //     Colors.orange,
+            //     Colors.yellow,
+            //     Colors.green,
+            //     Colors.blue,
+            //     Colors.indigo,
+            //     Colors.purple
+            //   ],
+            //   innerThumbRadius: 5,
+            //   innerThumbStrokeWidth: 3,
+            //   innerThumbColor: Colors.white,
+            //   outerThumbRadius: 5,
+            //   outerThumbStrokeWidth: 10,
+            //   outerThumbColor: Colors.blueAccent,
+            //   dashWidth: 1,
+            //   dashGap: 2,
+            //   animation: true,
+            //   valueNotifier: _valueNotifier,
+            //   child: Center(
+            //     child: ValueListenableBuilder(
+            //         valueListenable: _valueNotifier,
+            //         builder: (_, double value, __) => Column(
+            //               mainAxisSize: MainAxisSize.min,
+            //               children: [
+            //                 Text('${value.round()}',
+            //                     style: TextStyle(
+            //                         color: Colors.grey[600], fontSize: 24)),
+            //                 Text('progress',
+            //                     style: TextStyle(
+            //                         color: Colors.grey[600], fontSize: 12)),
+            //               ],
+            //             )),
+            //   ),
+            // ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[800],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black,
+                    blurRadius: 5,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+                shape: BoxShape.rectangle,
+              ),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DeviceVideo(),
+                    ),
+                  );
+                },
+                child: const ListTile(
+                  minVerticalPadding: 10,
+                  leading: Icon(Icons.ondemand_video),
+                  title: Text('Upload Video From Device'),
+                  subtitle: Text(
+                    'Transcription by uploading video file fom your mobile storage',
+                  ),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 16,
+            Container(
+              margin: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[800],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black,
+                    blurRadius: 5,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+                shape: BoxShape.rectangle,
+              ),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UrlVideo(),
+                    ),
+                  );
+                },
+                child: const ListTile(
+                  minVerticalPadding: 10,
+                  leading: Icon(Icons.link),
+                  title: Text('Upload Video From URL'),
+                  subtitle: Text(
+                    'Transcription by uploading video file from URL',
+                  ),
+                ),
+              ),
             ),
-            child: ElevatedButton(
-              onPressed: () async {
-                await _downloadVideoFromUrl(urlController.text);
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            //   child: TextField(
+            //     controller: urlController,
+            //     decoration: const InputDecoration(
+            //       labelText: "Enter Video URL",
+            //       labelStyle:
+            //           TextStyle(color: Color.fromARGB(255, 227, 227, 227)),
+            //       border: OutlineInputBorder(
+            //           borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            //       contentPadding:
+            //           EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(
+            //     horizontal: 8.0,
+            //     vertical: 16,
+            //   ),
+            //   child: ElevatedButton(
+            //     onPressed: () async {
+            //       await _downloadVideoFromUrl(urlController.text);
+            //     },
+            //     child: const Text('Upload From URL'),
+            //   ),
+            // ),
+            ElevatedButton(
+                onPressed: () {
+                  client.close();
+                },
+                child: const Text('Cancel Download')),
+            // BannerAdWidget(),
+            ElevatedButton(
+              onPressed: () {
+                interstitialAd!.show();
               },
-              child: Text('Upload From URL'),
+              child: const Text('Show interstitialAd Ad'),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 16,
-            ),
-            child: Text('OR'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await _pickVideo();
-            },
-            child: const Text('Upload From Device'),
-          ),
-          videoFile != null
-              ? FutureBuilder(
-                  key: UniqueKey(),
-                  future: _convertVideoToSrt(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return VideoPlayerView(
-                        key: UniqueKey(),
-                        url: videoFile!.path!,
-                        dataSourceType: DataSourceType.file,
-                        subtitleData: snapshot.data.toString(),
-                      );
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
+            // NativeAdWidget(),
+            ElevatedButton(
+              onPressed: () {
+                rewardedAd!.show(
+                  onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+                    debugPrint(
+                        '$RewardedAd with reward $RewardItem(${reward.amount}, ${reward.type})');
                   },
-                )
-              : Container(),
-        ],
+                );
+              },
+              child: const Text('Show Rewarded Ad'),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  Future<void> _pickVideo() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.video,
-      allowMultiple: false,
-    );
-    if (result == null || result.files.isEmpty) return;
-
-    setState(() {
-      videoFile = result.files.first;
-    });
-  }
-
-  Future<String> _convertVideoToSrt() async {
-    final directory = await getTemporaryDirectory();
-    final tempAudioPath =
-        '${directory.path}/${videoFile!.name + Random().nextInt(500).toString()}.m4a';
-
-    await _convertVideoToAudio(videoFile!.path!, tempAudioPath);
-
-    print('Audio file converted: $tempAudioPath');
-
-    var srtData = await _sendAudioToOpenAI(tempAudioPath);
-    print(srtData);
-    return srtData;
-  }
-
-  Future<void> _convertVideoToAudio(String inputPath, String outputPath) async {
-    String command =
-        '-i $inputPath -vn -ar 44100 -ac 2 -c:a aac -b:a 192k $outputPath';
-
-    int result = await _flutterFFmpeg.execute(command);
-
-    if (result == 0) {
-      print('Conversion successful');
-    } else {
-      print('Conversion failed');
-    }
-  }
-
-  Future<dynamic> _sendAudioToOpenAI(String audioPath) async {
-    final openaiApiKey = dotenv.env['OPENAI_API_KEY'];
-
-    if (openaiApiKey == null || openaiApiKey.isEmpty) {
-      print('OpenAI API key is missing');
-      return null;
-    }
-
-    final url = Uri.parse('https://api.openai.com/v1/audio/translations');
-    var request = http.MultipartRequest('POST', url);
-    request.headers.addAll({'Authorization': 'Bearer $openaiApiKey'});
-    request.fields['model'] = 'whisper-1';
-    request.fields['response_format'] = 'srt';
-    request.files.add(await http.MultipartFile.fromPath('file', audioPath));
-    try {
-      final response = await request.send();
-      if (response.statusCode == 200) {
-        print('Audio file sent successfully to OpenAI API');
-        var responseData = await http.Response.fromStream(response);
-        print(responseData.body);
-        return responseData.body;
-      } else {
-        print('Failed to send audio file. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error sending audio file: $error');
-      return null;
-    }
   }
 
   Future<void> _downloadVideoFromUrl(String videoUrl) async {
     try {
-      var response = await http.get(Uri.parse(videoUrl));
-
+      // var response = await http.get(Uri.parse(videoUrl));
+      var response = await client.get(Uri.parse(videoUrl));
       if (response.statusCode == 200) {
         final directory = await getTemporaryDirectory();
         final videoFileName = path.basename(videoUrl);
-
         final videoFilePath = path.join(directory.path, videoFileName);
+        debugPrint('Video file path: $videoFilePath');
 
         File tempVideoFile = File(videoFilePath);
         await tempVideoFile.writeAsBytes(response.bodyBytes);
@@ -195,12 +293,13 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         });
 
-        print('Video downloaded and saved: $videoFilePath');
+        debugPrint('Video downloaded and saved: $videoFilePath');
       } else {
-        print('Failed to download video. Status code: ${response.statusCode}');
+        debugPrint(
+            'Failed to download video. Status code: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error downloading video: $error');
+      debugPrint('Error downloading video: $error');
     }
   }
 }
