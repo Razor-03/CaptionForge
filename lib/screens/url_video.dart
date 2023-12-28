@@ -1,0 +1,184 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:caption_forge/lang.dart';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:caption_forge/Widget/video_player_view.dart';
+import 'package:video_player/video_player.dart';
+import 'package:path/path.dart' as path;
+import 'package:caption_forge/screens/play_video.dart';
+
+class UrlVideo extends StatefulWidget {
+  const UrlVideo({Key? key}) : super(key: key);
+
+  @override
+  State<UrlVideo> createState() => _UrlVideoState();
+}
+
+class _UrlVideoState extends State<UrlVideo> {
+  PlatformFile? videoFile;
+  TextEditingController urlController = TextEditingController();
+  var client = http.Client();
+  String language = '';
+  bool isDownloading = false;
+  double downloadProgress = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('URL Video'),
+      ),
+      body: Center(
+        child: isDownloading
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(value: downloadProgress),
+                  SizedBox(height: 16.0),
+                  Text(
+                    'Downloading... ${(downloadProgress * 100).toStringAsFixed(2)}%',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ],
+              )
+            : (videoFile == null
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 16),
+                        child: TextField(
+                          controller: urlController,
+                          decoration: const InputDecoration(
+                            labelText: "Enter Video URL",
+                            labelStyle: TextStyle(
+                                color: Color.fromARGB(255, 227, 227, 227)),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0))),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 12),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 16,
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await _downloadVideoFromUrl(urlController.text);
+                          },
+                          child: const Text('Upload From URL'),
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      VideoPlayerView(
+                        key: Key(videoFile!.path!),
+                        url: videoFile!.path!,
+                        dataSourceType: DataSourceType.file,
+                      ),
+                      CustomDropdown.search(
+                        closedFillColor: Colors.grey[800],
+                        expandedFillColor: Colors.grey[800],
+                        expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
+                            color: Colors.white),
+                        closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
+                            color: Colors.white),
+                        onChanged: (value) {
+                          setState(() {
+                            language = value;
+                          });
+                        },
+                        hintText: 'Select your language',
+                        items: [
+                          'Original',
+                          ...lang.map((e) => e['language']!).toList()
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PlayVideo(
+                                  videoPath: videoFile!.path!,
+                                  language: language),
+                            ),
+                          );
+                        },
+                        child: const Text('Generate'),
+                      ),
+                    ],
+                  )),
+      ),
+    );
+  }
+
+  Future<void> _downloadVideoFromUrl(String videoUrl) async {
+    try {
+      setState(() {
+        isDownloading = true;
+        downloadProgress = 0.0;
+      });
+
+      var request = http.Request('GET', Uri.parse(videoUrl));
+      var response = await client.send(request);
+
+      if (response.statusCode == 200) {
+        final directory = await getTemporaryDirectory();
+        final videoFileName = path.basename(videoUrl);
+        final videoFilePath = path.join(directory.path, videoFileName);
+        debugPrint('Video file path: $videoFilePath');
+
+        File tempVideoFile = File(videoFilePath);
+
+        var contentLength = response.contentLength ?? -1;
+        var receivedBytes = 0;
+
+        await response.stream.forEach((List<int> chunk) {
+          tempVideoFile.writeAsBytesSync(chunk, mode: FileMode.append);
+          receivedBytes += chunk.length;
+          setState(() {
+            downloadProgress = receivedBytes / contentLength;
+          });
+        });
+
+        setState(() {
+          tempVideoFile = tempVideoFile;
+          videoFile = PlatformFile(
+            name: videoFileName,
+            path: videoFilePath,
+            size: tempVideoFile.lengthSync(),
+          );
+          isDownloading = false;
+        });
+
+        debugPrint('Video downloaded and saved: $videoFilePath');
+      } else {
+        debugPrint(
+            'Failed to download video. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      debugPrint('Error downloading video: $error');
+      setState(() {
+        isDownloading = false;
+        downloadProgress = 0.0;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    client.close();
+    super.dispose();
+  }
+}

@@ -14,6 +14,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as path;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:caption_forge/screens/device_video.dart';
+import 'package:caption_forge/screens/url_video.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,10 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            LoadingAnimationWidget.fourRotatingDots(
-              size: 50,
-              color: Colors.white,
-            ),
             Container(
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -117,8 +114,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
                 shape: BoxShape.rectangle,
               ),
-              child: const InkWell(
-                child: ListTile(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UrlVideo(),
+                    ),
+                  );
+                },
+                child: const ListTile(
                   minVerticalPadding: 10,
                   leading: Icon(Icons.link),
                   title: Text('Upload Video From URL'),
@@ -128,33 +133,33 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextField(
-                controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: "Enter Video URL",
-                  labelStyle:
-                      TextStyle(color: Color.fromARGB(255, 227, 227, 227)),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 16,
-              ),
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _downloadVideoFromUrl(urlController.text);
-                },
-                child: const Text('Upload From URL'),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            //   child: TextField(
+            //     controller: urlController,
+            //     decoration: const InputDecoration(
+            //       labelText: "Enter Video URL",
+            //       labelStyle:
+            //           TextStyle(color: Color.fromARGB(255, 227, 227, 227)),
+            //       border: OutlineInputBorder(
+            //           borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            //       contentPadding:
+            //           EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(
+            //     horizontal: 8.0,
+            //     vertical: 16,
+            //   ),
+            //   child: ElevatedButton(
+            //     onPressed: () async {
+            //       await _downloadVideoFromUrl(urlController.text);
+            //     },
+            //     child: const Text('Upload From URL'),
+            //   ),
+            // ),
             ElevatedButton(
                 onPressed: () {
                   client.close();
