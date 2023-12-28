@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:caption_forge/Ads/banner_ad.dart';
+import 'package:caption_forge/Ads/interstitial_ad.dart';
 import 'package:caption_forge/lang.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +28,12 @@ class _UrlVideoState extends State<UrlVideo> {
   String language = '';
   bool isDownloading = false;
   double downloadProgress = 0.0;
+
+  @override
+  void initState() {
+    loadInterstitialAd();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +128,10 @@ class _UrlVideoState extends State<UrlVideo> {
                       ),
                     ],
                   )),
+      ),
+      bottomNavigationBar: const SizedBox(
+        width: double.infinity,
+        child: BannerAdWidget(adSize: AdSize.banner),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:caption_forge/lang.dart';
 import 'package:caption_forge/screens/play_video.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:video_player/video_player.dart';
 
 class DeviceVideo extends StatefulWidget {
@@ -31,65 +32,61 @@ class _DeviceVideoState extends State<DeviceVideo> {
         title: const Text('Device Video'),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            videoFile == null
-                ? ElevatedButton(
-                    onPressed: () {
-                      _pickVideo();
-                    },
-                    child: const Text("Upload From Device"),
-                  )
-                : SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        VideoPlayerView(
-                          key: Key(videoFile!.path!),
-                          url: videoFile!.path!,
-                          dataSourceType: DataSourceType.file,
-                        ),
-                        CustomDropdown.search(
-                          closedFillColor: Colors.grey[800],
-                          expandedFillColor: Colors.grey[800],
-                          expandedSuffixIcon: const Icon(
-                              Icons.keyboard_arrow_up,
-                              color: Colors.white),
-                          closedSuffixIcon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white),
-                          onChanged: (value) {
-                            setState(() {
-                              language = value;
-                            });
-                          },
-                          hintText: 'Select your language',
-                          items: [
-                            'Original',
-                            ...lang.map((e) => e['language']!).toList()
-                          ],
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlayVideo(
-                                    videoPath: videoFile!.path!,
-                                    language: language),
-                              ),
-                            );
-                          },
-                          child: const Text('Generate'),
-                        ),
-                      ],
-                    ),
+        child: Center(
+          child: videoFile == null
+              ? ElevatedButton(
+                  onPressed: () {
+                    _pickVideo();
+                  },
+                  child: const Text("Upload From Device"),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      VideoPlayerView(
+                        key: Key(videoFile!.path!),
+                        url: videoFile!.path!,
+                        dataSourceType: DataSourceType.file,
+                      ),
+                      CustomDropdown.search(
+                        closedFillColor: Colors.grey[800],
+                        expandedFillColor: Colors.grey[800],
+                        expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
+                            color: Colors.white),
+                        closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
+                            color: Colors.white),
+                        onChanged: (value) {
+                          setState(() {
+                            language = value;
+                          });
+                        },
+                        hintText: 'Select your language',
+                        items: [
+                          'Original',
+                          ...lang.map((e) => e['language']!).toList()
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PlayVideo(
+                                  videoPath: videoFile!.path!,
+                                  language: language),
+                            ),
+                          );
+                        },
+                        child: const Text('Generate'),
+                      ),
+                    ],
                   ),
-            const SizedBox(
-              width: double.infinity,
-              child: BannerAdWidget(),
-            ),
-          ],
+                ),
         ),
+      ),
+      bottomNavigationBar: const SizedBox(
+        width: double.infinity,
+        child: BannerAdWidget(adSize: AdSize.banner),
       ),
     );
   }

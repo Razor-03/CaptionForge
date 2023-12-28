@@ -1,17 +1,9 @@
-import 'dart:async';
-import 'dart:io';
 import 'package:caption_forge/Ads/app_open_ad.dart';
 import 'package:caption_forge/Ads/banner_ad.dart';
-import 'package:caption_forge/Ads/interstitial_ad.dart';
-import 'package:caption_forge/Ads/native_ad.dart';
-import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:path/path.dart' as path;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:caption_forge/screens/device_video.dart';
 import 'package:caption_forge/screens/url_video.dart';
@@ -52,8 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     loadOpenAppAd();
-    // loadInterstitialAd();
-    // loadRewardAd();
   }
 
   @override
@@ -160,68 +150,74 @@ class _MyHomePageState extends State<MyHomePage> {
             //     child: const Text('Upload From URL'),
             //   ),
             // ),
-            ElevatedButton(
-                onPressed: () {
-                  client.close();
-                },
-                child: const Text('Cancel Download')),
-            ElevatedButton(
-              onPressed: () {
-                interstitialAd!.show();
-              },
-              child: const Text('Show interstitialAd Ad'),
-            ),
-            // NativeAdWidget(),
-            ElevatedButton(
-              onPressed: () {
-                rewardedAd!.show(
-                  onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-                    debugPrint(
-                        '$RewardedAd with reward $RewardItem(${reward.amount}, ${reward.type})');
-                  },
-                );
-              },
-              child: const Text('Show Rewarded Ad'),
-            ),
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: BannerAdWidget(),
-            ),
+            // ElevatedButton(
+            //     onPressed: () {
+            //       client.close();
+            //     },
+            //     child: const Text('Cancel Download')),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     interstitialAd!.show();
+            //   },
+            //   child: const Text('Show interstitialAd Ad'),
+            // ),
+            // // NativeAdWidget(),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     rewardedAd!.show(
+            //       onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+            //         debugPrint(
+            //             '$RewardedAd with reward $RewardItem(${reward.amount}, ${reward.type})');
+            //       },
+            //     );
+            //   },
+            //   child: const Text('Show Rewarded Ad'),
+            // ),
+            // const Align(
+            //   alignment: Alignment.bottomCenter,
+            //   child: BannerAdWidget(
+            //     adSize: AdSize.mediumRectangle,
+            //   ),
+            // ),
           ],
         ),
+      ),
+      bottomNavigationBar: const SizedBox(
+        width: double.infinity,
+        child: BannerAdWidget(adSize: AdSize.mediumRectangle),
       ),
     );
   }
 
-  Future<void> _downloadVideoFromUrl(String videoUrl) async {
-    try {
-      // var response = await http.get(Uri.parse(videoUrl));
-      var response = await client.get(Uri.parse(videoUrl));
-      if (response.statusCode == 200) {
-        final directory = await getTemporaryDirectory();
-        final videoFileName = path.basename(videoUrl);
-        final videoFilePath = path.join(directory.path, videoFileName);
-        debugPrint('Video file path: $videoFilePath');
+  // Future<void> _downloadVideoFromUrl(String videoUrl) async {
+  //   try {
+  //     // var response = await http.get(Uri.parse(videoUrl));
+  //     var response = await client.get(Uri.parse(videoUrl));
+  //     if (response.statusCode == 200) {
+  //       final directory = await getTemporaryDirectory();
+  //       final videoFileName = path.basename(videoUrl);
+  //       final videoFilePath = path.join(directory.path, videoFileName);
+  //       debugPrint('Video file path: $videoFilePath');
 
-        File tempVideoFile = File(videoFilePath);
-        await tempVideoFile.writeAsBytes(response.bodyBytes);
+  //       File tempVideoFile = File(videoFilePath);
+  //       await tempVideoFile.writeAsBytes(response.bodyBytes);
 
-        setState(() {
-          tempVideoFile = tempVideoFile;
-          videoFile = PlatformFile(
-            name: videoFileName,
-            path: videoFilePath,
-            size: tempVideoFile.lengthSync(),
-          );
-        });
+  //       setState(() {
+  //         tempVideoFile = tempVideoFile;
+  //         videoFile = PlatformFile(
+  //           name: videoFileName,
+  //           path: videoFilePath,
+  //           size: tempVideoFile.lengthSync(),
+  //         );
+  //       });
 
-        debugPrint('Video downloaded and saved: $videoFilePath');
-      } else {
-        debugPrint(
-            'Failed to download video. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      debugPrint('Error downloading video: $error');
-    }
-  }
+  //       debugPrint('Video downloaded and saved: $videoFilePath');
+  //     } else {
+  //       debugPrint(
+  //           'Failed to download video. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (error) {
+  //     debugPrint('Error downloading video: $error');
+  //   }
+  // }
 }
