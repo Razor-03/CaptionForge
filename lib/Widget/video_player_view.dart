@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerView extends StatefulWidget {
-  VideoPlayerView({
+  const VideoPlayerView({
     super.key,
     required this.url,
     required this.dataSourceType,
@@ -16,7 +16,7 @@ class VideoPlayerView extends StatefulWidget {
 
   final DataSourceType dataSourceType;
 
-  String? subtitleData;
+  final String? subtitleData;
 
   @override
   State<VideoPlayerView> createState() => _VideoPlayerViewState();

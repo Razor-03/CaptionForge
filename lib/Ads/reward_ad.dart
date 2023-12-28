@@ -14,6 +14,7 @@ void loadRewardAd() {
         debugPrint('$ad loaded.');
         // Keep a reference to the ad so you can show it later.
         rewardedAd = ad;
+        ad.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {  });
       },
       // Called when an ad request failed.
       onAdFailedToLoad: (LoadAdError error) {

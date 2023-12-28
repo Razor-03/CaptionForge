@@ -5,16 +5,12 @@ import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/interstitial_ad.dart';
 import 'package:caption_forge/Ads/native_ad.dart';
 import 'package:caption_forge/Ads/reward_ad.dart';
-import 'package:caption_forge/lang.dart';
-import 'package:circular_seek_bar/circular_seek_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:caption_forge/Widget/video_player_view.dart';
-import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:caption_forge/screens/device_video.dart';
@@ -22,7 +18,6 @@ import 'package:caption_forge/screens/device_video.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  // loadOpenAppAd();
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
@@ -52,46 +47,14 @@ class _MyHomePageState extends State<MyHomePage> {
   PlatformFile? videoFile;
   TextEditingController urlController = TextEditingController();
   var client = http.Client();
-  // late Completer<void> _completer;
-
   @override
   void initState() {
     super.initState();
-    waiting();
-    // _completer = Completer<void>();
-
+    loadOpenAppAd();
     // loadInterstitialAd();
     // loadRewardAd();
   }
 
-  Future<int> waiting() async {
-    await Future.delayed(const Duration(seconds: 5));
-    setState(() {
-      _progress = 50;
-      _valueNotifier.value = 50;
-    });
-    await Future.delayed(const Duration(seconds: 5));
-    setState(() {
-      _progress = 80;
-      _valueNotifier.value = 80;
-    });
-    return await Future.delayed(const Duration(seconds: 50));
-  }
-
-  void setProgress(double progress) {
-    setState(() {
-      _progress = progress;
-    });
-  }
-
-  void setProgress1(double progress) {
-    setState(() {
-      _progress = progress;
-    });
-  }
-
-  final ValueNotifier<double> _valueNotifier = ValueNotifier(0);
-  var _progress = 0.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,49 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            CircularSeekBar(
-              key: ValueKey(_progress),
-              width: double.infinity,
-              height: 250,
-              progress: _progress,
-              barWidth: 8,
-              startAngle: 45,
-              sweepAngle: 270,
-              strokeCap: StrokeCap.butt,
-              progressGradientColors: const [
-                Colors.red,
-                Colors.orange,
-                Colors.yellow,
-                Colors.green,
-                Colors.blue,
-                Colors.indigo,
-                Colors.purple
-              ],
-              innerThumbRadius: 5,
-              innerThumbStrokeWidth: 3,
-              innerThumbColor: Colors.white,
-              outerThumbRadius: 5,
-              outerThumbStrokeWidth: 10,
-              outerThumbColor: Colors.blueAccent,
-              dashWidth: 1,
-              dashGap: 2,
-              animation: true,
-              valueNotifier: _valueNotifier,
-              child: Center(
-                child: ValueListenableBuilder(
-                    valueListenable: _valueNotifier,
-                    builder: (_, double value, __) => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('${value.round()}',
-                                style: TextStyle(
-                                    color: Colors.grey[600], fontSize: 24)),
-                            Text('progress',
-                                style: TextStyle(
-                                    color: Colors.grey[600], fontSize: 12)),
-                          ],
-                        )),
-              ),
+            LoadingAnimationWidget.fourRotatingDots(
+              size: 50,
+              color: Colors.white,
             ),
             Container(
               margin: const EdgeInsets.all(10),
@@ -237,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   client.close();
                 },
                 child: const Text('Cancel Download')),
-            // BannerAdWidget(),
             ElevatedButton(
               onPressed: () {
                 interstitialAd!.show();
@@ -255,6 +177,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('Show Rewarded Ad'),
+            ),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: BannerAdWidget(),
             ),
           ],
         ),

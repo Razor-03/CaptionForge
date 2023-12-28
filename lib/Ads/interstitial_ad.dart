@@ -14,6 +14,7 @@ void loadInterstitialAd() {
         debugPrint('$ad loaded.');
         // Keep a reference to the ad so you can show it later.
         interstitialAd = ad;
+        ad.show();
       },
       // Called when an ad request failed.
       onAdFailedToLoad: (LoadAdError error) {

@@ -1,7 +1,8 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
-
 class BannerAdWidget extends StatefulWidget {
+  const BannerAdWidget({super.key});
+
   @override
   _BannerAdWidgetState createState() => _BannerAdWidgetState();
 }
@@ -13,6 +14,10 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   void initState() {
     super.initState();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
     _bannerAd = BannerAd(
       adUnitId: 'ca-app-pub-3940256099942544/6300978111',
       size: AdSize.mediumRectangle,
@@ -39,6 +44,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return isLoaded
         ? SizedBox(
             key: UniqueKey(),
