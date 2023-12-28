@@ -71,7 +71,15 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      alignment: Alignment.center,
+      clipBehavior: Clip.antiAlias,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(10.0),
+        ),
+        
+      ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
           ? AspectRatio(

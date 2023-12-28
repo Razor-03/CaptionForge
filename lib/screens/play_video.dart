@@ -42,7 +42,7 @@ class _PlayVideoState extends State<PlayVideo> {
     }).catchError((error) {
       debugPrint('Error: $error');
     });
-    loadRewardAd();
+    // loadRewardAd();
     super.initState();
   }
 
@@ -52,22 +52,30 @@ class _PlayVideoState extends State<PlayVideo> {
       appBar: AppBar(
         title: const Text('Play Video'),
       ),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
           child: subtitleLoading
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     LoadingAnimationWidget.fourRotatingDots(
-                        color: Colors.blueAccent, size: 50),
-                    Text(progressString,
-                        style: TextStyle(color: Colors.grey[600], fontSize: 24)),
-                    ElevatedButton(
+                        color: Colors.white, size: 50),
+                    Text(
+                      progressString,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
                       onPressed: () {
                         cancelProcess();
                       },
-                      child: const Text('Cancel'),
+                      child: const Text('Cancel Process'),
                     ),
                   ],
                 )
@@ -81,13 +89,16 @@ class _PlayVideoState extends State<PlayVideo> {
                       dataSourceType: DataSourceType.file,
                       subtitleData: subtitle,
                     ),
-                    ElevatedButton(
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
                       onPressed: () {
                         saveFile(
                             '${path.basenameWithoutExtension(widget.videoPath)}.srt',
                             subtitle);
                       },
-                      child: const Text('Download'),
+                      child: const Text(
+                        'Download Subtitle',
+                      ),
                     ),
                   ],
                 ),
@@ -101,6 +112,7 @@ class _PlayVideoState extends State<PlayVideo> {
   }
 
   Future<String> _convertVideoToSrt() async {
+    await Future.delayed(const Duration(seconds: 50));
     updateProgress('Searching for subtitle file...');
     final tempDirectory = await getTemporaryDirectory();
     File searchFile = File(

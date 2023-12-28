@@ -21,11 +21,37 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: const MyHomePage(),
-        theme: ThemeData.dark().copyWith(
-            platform: Theme.of(context).platform == TargetPlatform.android
-                ? TargetPlatform.iOS
-                : Theme.of(context).platform));
+      home: const MyHomePage(),
+      theme: ThemeData.dark(useMaterial3: true).copyWith(
+        platform: Theme.of(context).platform == TargetPlatform.android
+            ? TargetPlatform.iOS
+            : Theme.of(context).platform,
+        
+      colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 57, 97, 132), brightness: Brightness.dark),
+
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.0),
+            ),
+          ),
+          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.symmetric(
+              horizontal: 25.0,
+              vertical: 15.0,
+            ),
+          ),
+          textStyle: MaterialStateProperty.all<TextStyle>(
+            const TextStyle(
+              fontSize: 16.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+      ),
+    );
   }
 }
 
@@ -184,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: const SizedBox(
         width: double.infinity,
-        child: BannerAdWidget(adSize: AdSize.mediumRectangle),
+        child: BannerAdWidget(adSize: AdSize.banner),
       ),
     );
   }
