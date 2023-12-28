@@ -112,7 +112,6 @@ class _PlayVideoState extends State<PlayVideo> {
   }
 
   Future<String> _convertVideoToSrt() async {
-    await Future.delayed(const Duration(seconds: 50));
     updateProgress('Searching for subtitle file...');
     final tempDirectory = await getTemporaryDirectory();
     File searchFile = File(
@@ -250,6 +249,17 @@ class _PlayVideoState extends State<PlayVideo> {
     final directory = Directory("/storage/emulated/0/Download");
     final file = File('${directory.path}/$fileName');
     await file.writeAsString(data);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Subtitle downloaded successfully to Downloads folder',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
+    );
   }
 
   void updateProgress(String message) {

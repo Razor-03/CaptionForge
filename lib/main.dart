@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
             ? TargetPlatform.iOS
             : Theme.of(context).platform,
         
-      colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 57, 97, 132), brightness: Brightness.dark),
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 57, 97, 132), brightness: Brightness.dark),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ButtonStyle(
