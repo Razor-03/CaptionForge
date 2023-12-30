@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/lang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
@@ -40,7 +42,7 @@ class _PlayVideoState extends State<PlayVideo> {
     }).catchError((error) {
       debugPrint('Error: $error');
     });
-    loadRewardAd();
+    // loadRewardAd();
     super.initState();
   }
 
@@ -50,42 +52,61 @@ class _PlayVideoState extends State<PlayVideo> {
       appBar: AppBar(
         title: const Text('Play Video'),
       ),
-      body: Center(
-        child: subtitleLoading
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LoadingAnimationWidget.fourRotatingDots(color: Colors.blueAccent, size: 50),
-                  Text(progressString, style: TextStyle(color: Colors.grey[600], fontSize: 24)),
-                  ElevatedButton(
-                    onPressed: () {
-                      cancelProcess();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  VideoPlayerView(
-                    key: UniqueKey(),
-                    url: widget.videoPath,
-                    dataSourceType: DataSourceType.file,
-                    subtitleData: subtitle,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      saveFile(
-                          '${path.basenameWithoutExtension(widget.videoPath)}.srt',
-                          subtitle);
-                    },
-                    child: const Text('Download'),
-                  ),
-                ],
-              ),
+      body: Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: subtitleLoading
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LoadingAnimationWidget.fourRotatingDots(
+                        color: Colors.white, size: 50),
+                    Text(
+                      progressString,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
+                      onPressed: () {
+                        cancelProcess();
+                      },
+                      child: const Text('Cancel Process'),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    VideoPlayerView(
+                      key: UniqueKey(),
+                      url: widget.videoPath,
+                      dataSourceType: DataSourceType.file,
+                      subtitleData: subtitle,
+                    ),
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
+                      onPressed: () {
+                        saveFile(
+                            '${path.basenameWithoutExtension(widget.videoPath)}.srt',
+                            subtitle);
+                      },
+                      child: const Text(
+                        'Download Subtitle',
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+      bottomNavigationBar: const SizedBox(
+        width: double.infinity,
+        child: BannerAdWidget(adSize: AdSize.banner),
       ),
     );
   }
@@ -119,29 +140,29 @@ class _PlayVideoState extends State<PlayVideo> {
       debugPrint('Audio file converted: $tempAudioPath');
     }
 
-    // var srtData = await _sendAudioToOpenAI(tempAudioPath);
-    var srtData = """
-1
-00:00:00,000 --> 00:00:02,000
-Cognac?
+    var srtData = await _sendAudioToOpenAI(tempAudioPath);
+//     var srtData = """
+// 1
+// 00:00:00,000 --> 00:00:02,000
+// Cognac?
 
-2
-00:00:02,000 --> 00:00:04,000
-No, thank you.
+// 2
+// 00:00:02,000 --> 00:00:04,000
+// No, thank you.
 
-3
-00:00:04,000 --> 00:00:06,000
-Listen, I'm...
+// 3
+// 00:00:04,000 --> 00:00:06,000
+// Listen, I'm...
 
-4
-00:00:06,000 --> 00:00:08,000
-sorry...
+// 4
+// 00:00:06,000 --> 00:00:08,000
+// sorry...
 
-5
-00:00:08,000 --> 00:00:10,000
-for your loss.
+// 5
+// 00:00:08,000 --> 00:00:10,000
+// for your loss.
 
-""";
+// """;
     debugPrint(srtData);
     final File srtFile = File(
         "${tempDirectory.path}/${path.basenameWithoutExtension(widget.videoPath)}.${widget.language == 'Original' ? 'Original' : 'English'}.srt");
@@ -221,12 +242,24 @@ for your loss.
     updateProgress("Cancelling process...");
     _flutterFFmpeg.cancel();
     client.close();
+    Navigator.pop(context);
   }
 
   void saveFile(String fileName, String data) async {
     final directory = Directory("/storage/emulated/0/Download");
     final file = File('${directory.path}/$fileName');
     await file.writeAsString(data);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Subtitle downloaded successfully to Downloads folder',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
+    );
   }
 
   void updateProgress(String message) {

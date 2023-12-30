@@ -5,7 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BannerAdWidget extends StatefulWidget {
+<<<<<<< HEAD
   const BannerAdWidget({super.key});
+=======
+  const BannerAdWidget({super.key, required this.adSize});
+  final AdSize adSize;
+
+>>>>>>> 0607e14285ce68ff50fabf84188f905b5c5e4428
   @override
   _BannerAdWidgetState createState() => _BannerAdWidgetState();
 }
@@ -28,8 +34,13 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   void _loadBannerAd(String adUnitId) {
     _bannerAd = BannerAd(
+<<<<<<< HEAD
       adUnitId: adUnitId,
       size: AdSize.mediumRectangle,
+=======
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: widget.adSize,
+>>>>>>> 0607e14285ce68ff50fabf84188f905b5c5e4428
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
