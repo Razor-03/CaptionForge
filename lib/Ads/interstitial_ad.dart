@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 InterstitialAd? interstitialAd;
-const _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
 
-void loadInterstitialAd() {
+void loadInterstitialAd({String adUnitId = 'ca-app-pub-3940256099942544/1033173712'}) {
   InterstitialAd.load(
-    adUnitId: _interstitialAdUnitId,
+    adUnitId: adUnitId,
     request: const AdRequest(),
     adLoadCallback: InterstitialAdLoadCallback(
       // Called when an ad is successfully received.

@@ -2,7 +2,7 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/interstitial_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
-import 'package:caption_forge/lang.dart';
+import 'package:caption_forge/utils/lang.dart';
 import 'package:caption_forge/screens/play_video.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';

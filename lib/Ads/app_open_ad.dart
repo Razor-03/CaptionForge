@@ -3,9 +3,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 AppOpenAd? appOpenAd;
 
-void loadOpenAppAd() {
+void loadOpenAppAd({String adUnitId = "ca-app-pub-3940256099942544/9257395921"}) {
   AppOpenAd.load(
-    adUnitId: "ca-app-pub-3940256099942544/9257395921",
+    adUnitId: adUnitId,
     orientation: AppOpenAd.orientationPortrait,
     request: const AdRequest(),
     adLoadCallback: AppOpenAdLoadCallback(

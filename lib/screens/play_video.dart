@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
-import 'package:caption_forge/lang.dart';
+import 'package:caption_forge/utils/lang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';

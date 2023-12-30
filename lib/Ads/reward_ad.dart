@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 RewardedAd? rewardedAd;
-const _rewardAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
 
-void loadRewardAd() {
+void loadRewardAd({String adUnitId = 'ca-app-pub-3940256099942544/5224354917'}) {
   RewardedAd.load(
-    adUnitId: _rewardAdUnitId,
+    adUnitId: adUnitId,
     request: const AdRequest(),
     rewardedAdLoadCallback: RewardedAdLoadCallback(
       // Called when an ad is successfully received.

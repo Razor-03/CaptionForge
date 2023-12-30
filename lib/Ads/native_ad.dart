@@ -2,6 +2,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 
 class NativeAdWidget extends StatefulWidget {
+  const NativeAdWidget({super.key, this.adUnitId = 'ca-app-pub-3940256099942544/2247696110'});
+  final String adUnitId;
+
   @override
   _NativeAdWidgetState createState() => _NativeAdWidgetState();
 }
@@ -9,7 +12,6 @@ class NativeAdWidget extends StatefulWidget {
 class _NativeAdWidgetState extends State<NativeAdWidget> {
   NativeAd? _nativeAd;
   bool _nativeAdIsLoaded = false;
-  final _nativeAdUnitId = 'ca-app-pub-3940256099942544/2247696110';
 
   @override
   void initState() {
@@ -19,7 +21,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
 
   void loadNativeAd() {
     _nativeAd = NativeAd(
-      adUnitId: _nativeAdUnitId,
+      adUnitId: widget.adUnitId,
       listener: NativeAdListener(
         onAdLoaded: (ad) {
           debugPrint('$NativeAd loaded.');
