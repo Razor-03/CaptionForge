@@ -1,10 +1,11 @@
+import 'dart:convert';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NativeAdWidget extends StatefulWidget {
-  const NativeAdWidget({super.key, this.adUnitId = 'ca-app-pub-3940256099942544/2247696110'});
-  final String adUnitId;
-
+  const NativeAdWidget({super.key});
   @override
   _NativeAdWidgetState createState() => _NativeAdWidgetState();
 }
@@ -16,12 +17,20 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
   @override
   void initState() {
     super.initState();
-    loadNativeAd();
+    SharedPreferences.getInstance().then((prefs) {
+      String adSettings = prefs.getString('ad_settings') ?? '';
+      if (adSettings.isNotEmpty) {
+        var ads = jsonDecode(adSettings);
+        if (ads['nativeAdmob'] && ads['ad_active']) {
+          loadNativeAd(ads['native_adUnit']);
+        }
+      }
+    });
   }
 
-  void loadNativeAd() {
+  void loadNativeAd(String adUnitId) {
     _nativeAd = NativeAd(
-      adUnitId: widget.adUnitId,
+      adUnitId: adUnitId,
       listener: NativeAdListener(
         onAdLoaded: (ad) {
           debugPrint('$NativeAd loaded.');
@@ -38,31 +47,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
       request: const AdRequest(),
       // Styling
       nativeTemplateStyle: NativeTemplateStyle(
-        // Required: Choose a template.
         templateType: TemplateType.small,
-        // Optional: Customize the ad's style.
-        // mainBackgroundColor: Colors.purple,
-        // cornerRadius: 10.0,
-        // callToActionTextStyle: NativeTemplateTextStyle(
-        //     textColor: Colors.cyan,
-        //     backgroundColor: Colors.red,
-        //     style: NativeTemplateFontStyle.monospace,
-        //     size: 16.0),
-        // primaryTextStyle: NativeTemplateTextStyle(
-        //     textColor: Colors.red,
-        //     backgroundColor: Colors.cyan,
-        //     style: NativeTemplateFontStyle.italic,
-        //     size: 16.0),
-        // secondaryTextStyle: NativeTemplateTextStyle(
-        //     textColor: Colors.green,
-        //     backgroundColor: Colors.black,
-        //     style: NativeTemplateFontStyle.bold,
-        //     size: 16.0),
-        // tertiaryTextStyle: NativeTemplateTextStyle(
-        //     textColor: Colors.brown,
-        //     backgroundColor: Colors.amber,
-        //     style: NativeTemplateFontStyle.normal,
-        //     size: 16.0),
       ),
     )..load();
   }

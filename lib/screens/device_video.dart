@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/interstitial_ad.dart';
@@ -7,6 +9,8 @@ import 'package:caption_forge/screens/play_video.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 class DeviceVideo extends StatefulWidget {
@@ -21,8 +25,21 @@ class _DeviceVideoState extends State<DeviceVideo> {
 
   @override
   void initState() {
-    loadInterstitialAd();
+    loadAd();
     super.initState();
+  }
+
+  Future<void> loadAd() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String adSettings = prefs.getString('ad_settings') ?? '';
+    debugPrint('Ad Settings: $adSettings');
+    
+    if (adSettings.isNotEmpty) {
+      var ads = jsonDecode(adSettings);
+      if (ads['interstritalAdmob'] && ads['ad_active']) {
+        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+      }
+    }
   }
 
   @override
@@ -43,18 +60,6 @@ class _DeviceVideoState extends State<DeviceVideo> {
                       height: 200.0,
                     ),
                     OutlinedButton(
-                      //  style: ElevatedButton.styleFrom(
-                      //   shape: RoundedRectangleBorder(
-                      //     borderRadius: BorderRadius.circular(32.0),
-                      //   ),
-                      //   padding: const EdgeInsets.symmetric(
-                      //     horizontal: 25.0,
-                      //     vertical: 15.0,
-                      //   ),
-                      //   textStyle: const TextStyle(
-                      //     fontSize: 18.0,
-                      //   ),
-                      // ),
                       onPressed: _pickVideo,
                       child: const Text(
                         'Upload Video',
@@ -72,48 +77,47 @@ class _DeviceVideoState extends State<DeviceVideo> {
                   ],
                 )
               : Column(
-                children: [
-                  VideoPlayerView(
-                    key: Key(videoFile!.path!),
-                    url: videoFile!.path!,
-                    dataSourceType: DataSourceType.file,
-                  ),
-                  const SizedBox(height: 16.0),
-                  CustomDropdown.search(
-                    
-                    closedFillColor: Colors.grey[800],
-                    expandedFillColor: Colors.grey[800],
-                    expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
-                        color: Colors.white),
-                    closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
-                        color: Colors.white),
-                    onChanged: (value) {
-                      setState(() {
-                        language = value;
-                      });
-                    },
-                    hintText: 'Select your language',
-                    items: [
-                      'Original',
-                      ...lang.map((e) => e['language']!).toList()
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlayVideo(
-                              videoPath: videoFile!.path!,
-                              language: language),
-                        ),
-                      );
-                    },
-                    child: const Text('Generate Subtitles'),
-                  ),
-                ],
-              ),
+                  children: [
+                    VideoPlayerView(
+                      key: Key(videoFile!.path!),
+                      url: videoFile!.path!,
+                      dataSourceType: DataSourceType.file,
+                    ),
+                    const SizedBox(height: 16.0),
+                    CustomDropdown.search(
+                      closedFillColor: Colors.grey[800],
+                      expandedFillColor: Colors.grey[800],
+                      expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
+                          color: Colors.white),
+                      closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
+                          color: Colors.white),
+                      onChanged: (value) {
+                        setState(() {
+                          language = value;
+                        });
+                      },
+                      hintText: 'Select your language',
+                      items: [
+                        'Original',
+                        ...lang.map((e) => e['language']!).toList()
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PlayVideo(
+                                videoPath: videoFile!.path!,
+                                language: language),
+                          ),
+                        );
+                      },
+                      child: const Text('Generate Subtitles'),
+                    ),
+                  ],
+                ),
         ),
       ),
       bottomNavigationBar: const SizedBox(
@@ -124,12 +128,25 @@ class _DeviceVideoState extends State<DeviceVideo> {
   }
 
   Future<void> _pickVideo() async {
+    // var imagePicker = ImagePicker();
+    // var video = await imagePicker.pickVideo(source: ImageSource.gallery);
+    // debugPrint('Vhwhideo: ${video!.path}, ${video.name}, ${video.length()}, ${video.lastModified()}');
+    // return;
+
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
       allowMultiple: false,
     );
+    
     if (result == null || result.files.isEmpty) return;
 
+    PlatformFile file = result.files.first;
+    debugPrint('File: ${file.path}, ${file.name}, ${file.size}, ${file.extension}, ${file.bytes}');
+
+    for (var element in result.files) {
+      debugPrint('File: ${element.path}');
+    }
     setState(() {
       videoFile = result.files.first;
     });

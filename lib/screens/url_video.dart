@@ -1,15 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/interstitial_ad.dart';
-import 'package:caption_forge/lang.dart';
+import 'package:caption_forge/utils/lang.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:caption_forge/Widget/video_player_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
 import 'package:caption_forge/screens/play_video.dart';
@@ -31,8 +33,20 @@ class _UrlVideoState extends State<UrlVideo> {
 
   @override
   void initState() {
-    loadInterstitialAd();
+    loadAd();
     super.initState();
+  }
+
+  Future<void> loadAd() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String adSettings = prefs.getString('ad_settings') ?? '';
+    debugPrint('Ad Settings: $adSettings');
+    if (adSettings.isNotEmpty) {
+      var ads = jsonDecode(adSettings);
+      if (ads['interstritalAdmob'] && ads['ad_active']) {
+        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+      }
+    }
   }
 
   @override
