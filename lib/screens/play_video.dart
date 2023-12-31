@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:caption_forge/Ads/banner_ad.dart';
-import 'package:caption_forge/Ads/reward_ad.dart';
+// import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/lang.dart';
 import 'package:flutter/material.dart';
@@ -162,7 +162,7 @@ class _PlayVideoState extends State<PlayVideo> {
 // 00:00:08,000 --> 00:00:10,000
 // for your loss.
 
-// """;
+// // """;
     debugPrint(srtData);
     final File srtFile = File(
         "${tempDirectory.path}/${path.basenameWithoutExtension(widget.videoPath)}.${widget.language == 'Original' ? 'Original' : 'English'}.srt");

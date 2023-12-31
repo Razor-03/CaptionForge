@@ -29,7 +29,7 @@ class _DeviceVideoState extends State<DeviceVideo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Device Video'),
+        title: const Text('Upload from Device'),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -72,48 +72,47 @@ class _DeviceVideoState extends State<DeviceVideo> {
                   ],
                 )
               : Column(
-                children: [
-                  VideoPlayerView(
-                    key: Key(videoFile!.path!),
-                    url: videoFile!.path!,
-                    dataSourceType: DataSourceType.file,
-                  ),
-                  const SizedBox(height: 16.0),
-                  CustomDropdown.search(
-                    
-                    closedFillColor: Colors.grey[800],
-                    expandedFillColor: Colors.grey[800],
-                    expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
-                        color: Colors.white),
-                    closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
-                        color: Colors.white),
-                    onChanged: (value) {
-                      setState(() {
-                        language = value;
-                      });
-                    },
-                    hintText: 'Select your language',
-                    items: [
-                      'Original',
-                      ...lang.map((e) => e['language']!).toList()
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlayVideo(
-                              videoPath: videoFile!.path!,
-                              language: language),
-                        ),
-                      );
-                    },
-                    child: const Text('Generate Subtitles'),
-                  ),
-                ],
-              ),
+                  children: [
+                    VideoPlayerView(
+                      key: Key(videoFile!.path!),
+                      url: videoFile!.path!,
+                      dataSourceType: DataSourceType.file,
+                    ),
+                    const SizedBox(height: 16.0),
+                    CustomDropdown.search(
+                      closedFillColor: Colors.grey[800],
+                      expandedFillColor: Colors.grey[800],
+                      expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
+                          color: Colors.white),
+                      closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
+                          color: Colors.white),
+                      onChanged: (value) {
+                        setState(() {
+                          language = value;
+                        });
+                      },
+                      hintText: 'Select your language',
+                      items: [
+                        'Original',
+                        ...lang.map((e) => e['language']!).toList()
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PlayVideo(
+                                videoPath: videoFile!.path!,
+                                language: language),
+                          ),
+                        );
+                      },
+                      child: const Text('Generate Subtitles'),
+                    ),
+                  ],
+                ),
         ),
       ),
       bottomNavigationBar: const SizedBox(
