@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "848893630051",
+    "project_id": "caption-forge",
+    "storage_bucket": "caption-forge.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:848893630051:android:18ddfeb1ed3d85b6288a56",
+        "android_client_info": {
+          "package_name": "com.example.caption_forge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfZdtO9Jb8qLxx3Fq-mTK69LbOcia9krs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,15 +22,17 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     SharedPreferences.getInstance().then((prefs) {
       String adSettings = prefs.getString('ad_settings') ?? '';
       if (adSettings.isNotEmpty) {
-        var bannerAdunit = jsonDecode(adSettings)['banner_adUnit'];
-        _loadBannerAd(bannerAdunit);
+        var ads = jsonDecode(adSettings);
+        if (ads['bannerAdmob'] && ads['ad_active']) {
+          _loadBannerAd(ads['banner_adUnit']);
+        }
       }
     });
   }
 
   void _loadBannerAd(String adUnitId) {
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      adUnitId: adUnitId,
       size: widget.adSize,
       request: const AdRequest(),
       listener: BannerAdListener(

@@ -4,12 +4,15 @@ import 'package:caption_forge/Ads/banner_ad.dart';
 // import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/lang.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:flutter_ffmpeg/media_information.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -42,8 +45,20 @@ class _PlayVideoState extends State<PlayVideo> {
     }).catchError((error) {
       debugPrint('Error: $error');
     });
-    // loadRewardAd();
+    // loadAd();
     super.initState();
+  }
+
+  Future<void> loadAd() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String adSettings = prefs.getString('ad_settings') ?? '';
+    debugPrint('Ad Settings: $adSettings');
+    if (adSettings.isNotEmpty) {
+      var ads = jsonDecode(adSettings);
+      if (ads['rewardAdmob'] && ads['ad_active']) {
+        loadRewardAd(adUnitId: ads['reward_adUnit']);
+      }
+    }
   }
 
   @override
@@ -112,6 +127,8 @@ class _PlayVideoState extends State<PlayVideo> {
   }
 
   Future<String> _convertVideoToSrt() async {
+    await saveVideoDetails(widget.videoPath, widget.language);
+
     updateProgress('Searching for subtitle file...');
     final tempDirectory = await getTemporaryDirectory();
     File searchFile = File(
@@ -140,29 +157,34 @@ class _PlayVideoState extends State<PlayVideo> {
       debugPrint('Audio file converted: $tempAudioPath');
     }
 
-    var srtData = await _sendAudioToOpenAI(tempAudioPath);
-//     var srtData = """
-// 1
-// 00:00:00,000 --> 00:00:02,000
-// Cognac?
+    // var srtData = await _sendAudioToOpenAI(tempAudioPath);
 
-// 2
-// 00:00:02,000 --> 00:00:04,000
-// No, thank you.
+    var srtData = """
+1
+00:00:00,000 --> 00:00:02,000
+Cognac?
 
-// 3
-// 00:00:04,000 --> 00:00:06,000
-// Listen, I'm...
+2
+00:00:02,000 --> 00:00:04,000
+No, thank you.
 
-// 4
-// 00:00:06,000 --> 00:00:08,000
-// sorry...
+3
+00:00:04,000 --> 00:00:06,000
+Listen, I'm...
 
-// 5
-// 00:00:08,000 --> 00:00:10,000
-// for your loss.
+4
+00:00:06,000 --> 00:00:08,000
+sorry...
 
+<<<<<<< HEAD
 // // """;
+=======
+5
+00:00:08,000 --> 00:00:10,000
+for your loss.
+
+""";
+>>>>>>> 4a5b26eb1a9dadb8d71efe3bcf0869a4d770b014
     debugPrint(srtData);
     final File srtFile = File(
         "${tempDirectory.path}/${path.basenameWithoutExtension(widget.videoPath)}.${widget.language == 'Original' ? 'Original' : 'English'}.srt");
@@ -173,6 +195,31 @@ class _PlayVideoState extends State<PlayVideo> {
     }
 
     return srtData;
+  }
+
+  Future<void> saveVideoDetails(String videoPath, String language) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user = prefs.getString('user') ?? '';
+    debugPrint('User: $user');
+    var userData = jsonDecode(user);
+    debugPrint('User Data: $userData');
+    final CollectionReference videoCollection = FirebaseFirestore.instance
+        .collection('User Info')
+        .doc(userData['id'])
+        .collection('Video Details');
+
+    final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
+    MediaInformation mediaInformation =
+        await flutterFFprobe.getMediaInformation(videoPath);
+    Map<dynamic, dynamic> mp = mediaInformation.getMediaProperties()!;
+
+    videoCollection.doc("${path.basename(videoPath)}.${DateTime.now()}").set({
+      'video_name': path.basename(videoPath),
+      'video_size': mp['size'],
+      'video_duration': mp['duration'],
+      'video_language': language,
+      'video_date': DateTime.now(),
+    });
   }
 
   Future<String> translateSrt(String srtData, String language) async {
