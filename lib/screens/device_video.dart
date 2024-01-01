@@ -9,7 +9,7 @@ import 'package:caption_forge/screens/play_video.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
@@ -25,7 +25,7 @@ class _DeviceVideoState extends State<DeviceVideo> {
 
   @override
   void initState() {
-    loadAd();
+    // loadAd();
     super.initState();
   }
 
@@ -33,11 +33,11 @@ class _DeviceVideoState extends State<DeviceVideo> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String adSettings = prefs.getString('ad_settings') ?? '';
     debugPrint('Ad Settings: $adSettings');
-    
+
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['interstritalAdmob'] && ads['ad_active']) {
-        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+        // loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
       }
     }
   }
@@ -46,7 +46,10 @@ class _DeviceVideoState extends State<DeviceVideo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Device Video'),
+        title: Text(
+          'Upload from Device',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -85,8 +88,8 @@ class _DeviceVideoState extends State<DeviceVideo> {
                     ),
                     const SizedBox(height: 16.0),
                     CustomDropdown.search(
-                      closedFillColor: Colors.grey[800],
-                      expandedFillColor: Colors.grey[800],
+                      closedFillColor: const Color(0xff4a5759),
+                      expandedFillColor: const Color(0xff4a5759),
                       expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
                           color: Colors.white),
                       closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
@@ -120,10 +123,10 @@ class _DeviceVideoState extends State<DeviceVideo> {
                 ),
         ),
       ),
-      bottomNavigationBar: const SizedBox(
-        width: double.infinity,
-        child: BannerAdWidget(adSize: AdSize.banner),
-      ),
+      // bottomNavigationBar: const SizedBox(
+      //   width: double.infinity,
+      //   child: BannerAdWidget(adSize: AdSize.banner),
+      // ),
     );
   }
 
@@ -133,16 +136,16 @@ class _DeviceVideoState extends State<DeviceVideo> {
     // debugPrint('Vhwhideo: ${video!.path}, ${video.name}, ${video.length()}, ${video.lastModified()}');
     // return;
 
-
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
       allowMultiple: false,
     );
-    
+
     if (result == null || result.files.isEmpty) return;
 
     PlatformFile file = result.files.first;
-    debugPrint('File: ${file.path}, ${file.name}, ${file.size}, ${file.extension}, ${file.bytes}');
+    debugPrint(
+        'File: ${file.path}, ${file.name}, ${file.size}, ${file.extension}, ${file.bytes}');
 
     for (var element in result.files) {
       debugPrint('File: ${element.path}');

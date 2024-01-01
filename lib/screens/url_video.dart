@@ -33,7 +33,7 @@ class _UrlVideoState extends State<UrlVideo> {
 
   @override
   void initState() {
-    loadAd();
+    // loadAd();
     super.initState();
   }
 
@@ -44,7 +44,7 @@ class _UrlVideoState extends State<UrlVideo> {
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['interstritalAdmob'] && ads['ad_active']) {
-        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+        // loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
       }
     }
   }
@@ -53,7 +53,10 @@ class _UrlVideoState extends State<UrlVideo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('URL Video'),
+        title: Text(
+          'URL Video',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
       ),
       body: Center(
         child: isDownloading
@@ -64,22 +67,27 @@ class _UrlVideoState extends State<UrlVideo> {
                   SizedBox(height: 16.0),
                   Text(
                     'Downloading... ${(downloadProgress * 100).toStringAsFixed(2)}%',
-                    style: TextStyle(fontSize: 16.0),
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               )
             : (videoFile == null
                 ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Image.asset(
+                        'assets/images/url_video.png',
+                        height: 90.0,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 16),
                         child: TextField(
+                          style: Theme.of(context).textTheme.bodySmall,
                           controller: urlController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Enter Video URL",
-                            labelStyle: TextStyle(
-                                color: Color.fromARGB(255, 227, 227, 227)),
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10.0))),
@@ -100,6 +108,14 @@ class _UrlVideoState extends State<UrlVideo> {
                           child: const Text('Upload From URL'),
                         ),
                       ),
+                      const Text(
+                        'You can paste any video url and transcribe it into the desired language. Only links that have a video file at the end will work.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   )
                 : Column(
@@ -110,8 +126,8 @@ class _UrlVideoState extends State<UrlVideo> {
                         dataSourceType: DataSourceType.file,
                       ),
                       CustomDropdown.search(
-                        closedFillColor: Colors.grey[800],
-                        expandedFillColor: Colors.grey[800],
+                        closedFillColor: const Color(0xff4a5759),
+                        expandedFillColor: const Color(0xff4a5759),
                         expandedSuffixIcon: const Icon(Icons.keyboard_arrow_up,
                             color: Colors.white),
                         closedSuffixIcon: const Icon(Icons.keyboard_arrow_down,
@@ -143,10 +159,10 @@ class _UrlVideoState extends State<UrlVideo> {
                     ],
                   )),
       ),
-      bottomNavigationBar: const SizedBox(
-        width: double.infinity,
-        child: BannerAdWidget(adSize: AdSize.banner),
-      ),
+      // bottomNavigationBar: const SizedBox(
+      //   width: double.infinity,
+      //   child: BannerAdWidget(adSize: AdSize.banner),
+      // ),
     );
   }
 
