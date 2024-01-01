@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:caption_forge/Ads/banner_ad.dart';
+import 'package:caption_forge/Ads/reward_ad.dart';
 // import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/lang.dart';
@@ -65,7 +66,8 @@ class _PlayVideoState extends State<PlayVideo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Play Video'),
+        title: Text('Play Video',
+            style: Theme.of(context).textTheme.headlineSmall),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -77,7 +79,7 @@ class _PlayVideoState extends State<PlayVideo> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     LoadingAnimationWidget.fourRotatingDots(
-                        color: Colors.white, size: 50),
+                        color: Color(0xffb0c4b1), size: 50),
                     Text(
                       progressString,
                       style: TextStyle(
@@ -119,10 +121,10 @@ class _PlayVideoState extends State<PlayVideo> {
                 ),
         ),
       ),
-      bottomNavigationBar: const SizedBox(
-        width: double.infinity,
-        child: BannerAdWidget(adSize: AdSize.banner),
-      ),
+      // bottomNavigationBar: const SizedBox(
+      //   width: double.infinity,
+      //   child: BannerAdWidget(adSize: AdSize.banner),
+      // ),
     );
   }
 
@@ -176,15 +178,11 @@ Listen, I'm...
 00:00:06,000 --> 00:00:08,000
 sorry...
 
-<<<<<<< HEAD
-// // """;
-=======
 5
 00:00:08,000 --> 00:00:10,000
 for your loss.
 
 """;
->>>>>>> 4a5b26eb1a9dadb8d71efe3bcf0869a4d770b014
     debugPrint(srtData);
     final File srtFile = File(
         "${tempDirectory.path}/${path.basenameWithoutExtension(widget.videoPath)}.${widget.language == 'Original' ? 'Original' : 'English'}.srt");

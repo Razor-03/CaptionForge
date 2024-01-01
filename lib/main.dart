@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -87,7 +88,92 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const MyHomePage(),
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
+      theme: ThemeData(
+        useMaterial3: true,
+      ).copyWith(
+        platform: Theme.of(context).platform == TargetPlatform.android
+            ? TargetPlatform.iOS
+            : Theme.of(context).platform,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xffb0c4b1),
+          brightness: Brightness.light,
+          primaryContainer: Color(0xffb0c4b1),
+          shadow: Color(0xffb0c4b1).withOpacity(0.5),
+          secondaryContainer: Colors.white, // used to be 0.5 opacity
+        ),
+        dropdownMenuTheme: DropdownMenuThemeData(
+          textStyle: TextStyle(
+            color: Color(0xffb0c4b1),
+            fontSize: 16,
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
+              ),
+            ),
+            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+              const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 15.0,
+              ),
+            ),
+            textStyle: MaterialStateProperty.all<TextStyle>(
+              const TextStyle(
+                fontSize: 16.0,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        textTheme: TextTheme(
+          displayLarge: GoogleFonts.roboto(
+            fontSize: 50,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xff4a5759),
+          ),
+          labelMedium: GoogleFonts.greatVibes(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xff4a5759),
+          ),
+          headlineSmall: GoogleFonts.roboto(
+            fontSize: 22,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xff4a5759),
+          ),
+          titleLarge: GoogleFonts.roboto(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            color: const Color(0xff4a5759),
+          ),
+          bodyMedium: GoogleFonts.merriweather(),
+          displaySmall: GoogleFonts.pacifico(),
+          bodySmall: GoogleFonts.roboto(
+            fontSize: 16,
+            fontStyle: FontStyle.normal,
+            color: const Color(0xff4a5759),
+          ),
+        ),
+        scaffoldBackgroundColor: Color(0xffdedbd2),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xffdedbd2),
+          // foregroundColor: Colors.black,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: GoogleFonts.oswald(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            color: const Color.fromARGB(255, 53, 37, 126),
+          ),
+        ),
+      ),
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
         platform: Theme.of(context).platform == TargetPlatform.android
             ? TargetPlatform.iOS
             : Theme.of(context).platform,
@@ -114,6 +200,21 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
+        ),
+        textTheme: TextTheme(
+          displayLarge: GoogleFonts.roboto(
+            fontSize: 42,
+            fontStyle: FontStyle.normal,
+            color: const Color.fromARGB(255, 57, 97, 132),
+          ),
+          // ···
+          titleLarge: GoogleFonts.roboto(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            color: const Color.fromARGB(255, 57, 97, 132),
+          ),
+          bodyMedium: GoogleFonts.merriweather(),
+          displaySmall: GoogleFonts.pacifico(),
         ),
       ),
     );
