@@ -9,7 +9,6 @@ import 'package:caption_forge/screens/play_video.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
@@ -25,7 +24,7 @@ class _DeviceVideoState extends State<DeviceVideo> {
 
   @override
   void initState() {
-    // loadAd();
+    loadAd();
     super.initState();
   }
 
@@ -37,7 +36,7 @@ class _DeviceVideoState extends State<DeviceVideo> {
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['interstritalAdmob'] && ads['ad_active']) {
-        // loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
       }
     }
   }
@@ -77,6 +76,7 @@ class _DeviceVideoState extends State<DeviceVideo> {
                         color: Colors.grey,
                       ),
                     ),
+                    const SizedBox(height: 50.0),
                   ],
                 )
               : Column(
@@ -123,19 +123,11 @@ class _DeviceVideoState extends State<DeviceVideo> {
                 ),
         ),
       ),
-      // bottomNavigationBar: const SizedBox(
-      //   width: double.infinity,
-      //   child: BannerAdWidget(adSize: AdSize.banner),
-      // ),
+      bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),
     );
   }
 
   Future<void> _pickVideo() async {
-    // var imagePicker = ImagePicker();
-    // var video = await imagePicker.pickVideo(source: ImageSource.gallery);
-    // debugPrint('Vhwhideo: ${video!.path}, ${video.name}, ${video.length()}, ${video.lastModified()}');
-    // return;
-
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
       allowMultiple: false,

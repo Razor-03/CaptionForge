@@ -33,7 +33,7 @@ class _UrlVideoState extends State<UrlVideo> {
 
   @override
   void initState() {
-    // loadAd();
+    loadAd();
     super.initState();
   }
 
@@ -44,7 +44,7 @@ class _UrlVideoState extends State<UrlVideo> {
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['interstritalAdmob'] && ads['ad_active']) {
-        // loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
       }
     }
   }
@@ -64,7 +64,7 @@ class _UrlVideoState extends State<UrlVideo> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(value: downloadProgress),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     'Downloading... ${(downloadProgress * 100).toStringAsFixed(2)}%',
                     style: Theme.of(context).textTheme.bodySmall,
@@ -88,10 +88,10 @@ class _UrlVideoState extends State<UrlVideo> {
                           decoration: InputDecoration(
                             labelText: "Enter Video URL",
                             labelStyle: Theme.of(context).textTheme.bodySmall,
-                            border: OutlineInputBorder(
+                            border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10.0))),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 20, horizontal: 12),
                           ),
                         ),
@@ -159,10 +159,7 @@ class _UrlVideoState extends State<UrlVideo> {
                     ],
                   )),
       ),
-      // bottomNavigationBar: const SizedBox(
-      //   width: double.infinity,
-      //   child: BannerAdWidget(adSize: AdSize.banner),
-      // ),
+      bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),
     );
   }
 

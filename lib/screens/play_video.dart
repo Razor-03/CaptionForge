@@ -130,15 +130,12 @@ class _PlayVideoState extends State<PlayVideo> {
                 ),
         ),
       ),
-      // bottomNavigationBar: const SizedBox(
-      //   width: double.infinity,
-      //   child: BannerAdWidget(adSize: AdSize.banner),
-      // ),
+      bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),
     );
   }
 
   Future<String> _convertVideoToSrt() async {
-    await saveVideoDetails(widget.videoPath, widget.language);
+   saveVideoDetails(widget.videoPath, widget.language);
 
     updateProgress('Searching for subtitle file...');
     final directory = await getTemporaryDirectory();

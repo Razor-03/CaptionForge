@@ -31,23 +31,25 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   }
 
   void _loadBannerAd(String adUnitId) {
-    _bannerAd = BannerAd(
-      adUnitId: adUnitId,
-      size: widget.adSize,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            isLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (_, error) {
-          debugPrint(
-              'Ad load failed (code=${error.code} message=${error.message})');
-        },
-      ),
-    );
-    _bannerAd!.load();
+    setState(() {
+      _bannerAd = BannerAd(
+        adUnitId: adUnitId,
+        size: widget.adSize,
+        request: const AdRequest(),
+        listener: BannerAdListener(
+          onAdLoaded: (_) {
+            setState(() {
+              isLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (_, error) {
+            debugPrint(
+                'Ad load failed (code=${error.code} message=${error.message})');
+          },
+        ),
+      );
+      _bannerAd!.load();
+    });
   }
 
   @override
@@ -60,11 +62,11 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   Widget build(BuildContext context) {
     return isLoaded
         ? SizedBox(
-            key: UniqueKey(),
-            width: _bannerAd!.size.width.toDouble(),
+            // key: UniqueKey(),
+            width: double.infinity,
             height: _bannerAd!.size.height.toDouble(),
             child: AdWidget(
-              key: UniqueKey(),
+              // key: UniqueKey(),
               ad: _bannerAd!,
             ),
           )
