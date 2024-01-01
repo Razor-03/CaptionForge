@@ -161,13 +161,16 @@ class _UrlVideoState extends State<UrlVideo> {
       var response = await client.send(request);
 
       if (response.statusCode == 200) {
-        final directory = await getTemporaryDirectory();
+        final tempDirectory = await getTemporaryDirectory();
+        final directory = Directory('${tempDirectory.path}/file_picker');
+        if (!await directory.exists()) {
+          await directory.create(recursive: true);
+        }
         final videoFileName = path.basename(videoUrl);
         final videoFilePath = path.join(directory.path, videoFileName);
         debugPrint('Video file path: $videoFilePath');
 
         File tempVideoFile = File(videoFilePath);
-
         var contentLength = response.contentLength ?? -1;
         var receivedBytes = 0;
 

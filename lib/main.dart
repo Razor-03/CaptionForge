@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:caption_forge/firebase_options.dart';
+import 'package:caption_forge/screens/history.dart';
 import 'package:caption_forge/screens/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
@@ -21,6 +23,12 @@ void main() async {
   debugPrint("Ads Data Fetched");
   await fetchAndStoreUserData();
   debugPrint("User Data Fetched");
+  var dir = await getTemporaryDirectory();
+  debugPrint("Temporary Directory: ${dir.path}");
+  for (var file in dir.listSync()) {
+    debugPrint("File: ${file.path}");
+  }
+
   runApp(const MyApp());
 }
 
@@ -86,7 +94,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage(),
+      home: const History(),
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         platform: Theme.of(context).platform == TargetPlatform.android
             ? TargetPlatform.iOS

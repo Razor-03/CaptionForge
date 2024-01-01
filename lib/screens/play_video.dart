@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
+import 'package:caption_forge/utils/firebase_notification.dart';
 import 'package:caption_forge/utils/lang.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -34,10 +35,16 @@ class _PlayVideoState extends State<PlayVideo> {
   String progressString = '';
   late String subtitle;
   bool subtitleLoading = true;
+  var notificationService = NotificationService();
 
   @override
   void initState() {
     _convertVideoToSrt().then((value) {
+      notificationService.showLocalNotification(
+        'Subtitle generated successfully',
+        null,
+        null,
+      );
       setState(() {
         subtitle = value;
         subtitleLoading = false;
@@ -46,6 +53,7 @@ class _PlayVideoState extends State<PlayVideo> {
       debugPrint('Error: $error');
     });
     // loadAd();
+    notificationService.initNotifications();
     super.initState();
   }
 
@@ -130,7 +138,11 @@ class _PlayVideoState extends State<PlayVideo> {
     await saveVideoDetails(widget.videoPath, widget.language);
 
     updateProgress('Searching for subtitle file...');
-    final tempDirectory = await getTemporaryDirectory();
+    final directory = await getTemporaryDirectory();
+    final tempDirectory = Directory("${directory.path}/subtitle");
+    if (!tempDirectory.existsSync()) {
+      tempDirectory.createSync();
+    }
     File searchFile = File(
         "${tempDirectory.path}/${path.basenameWithoutExtension(widget.videoPath)}.${widget.language == 'Original' ? 'Original' : 'English'}.srt");
     if (searchFile.existsSync()) {
@@ -146,7 +158,7 @@ class _PlayVideoState extends State<PlayVideo> {
     debugPrint('Video file: ${widget.videoPath}');
 
     final tempAudioPath =
-        '${tempDirectory.path}/${path.basename(widget.videoPath)}.m4a';
+        '${directory.path}/${path.basename(widget.videoPath)}.m4a';
 
     updateProgress("Searching for audio file...");
     if (File(tempAudioPath).existsSync()) {
@@ -208,14 +220,17 @@ for your loss.
     MediaInformation mediaInformation =
         await flutterFFprobe.getMediaInformation(videoPath);
     Map<dynamic, dynamic> mp = mediaInformation.getMediaProperties()!;
-
-    videoCollection.doc("${path.basename(videoPath)}.${DateTime.now()}").set({
+    var data = {
       'video_name': path.basename(videoPath),
       'video_size': mp['size'],
       'video_duration': mp['duration'],
       'video_language': language,
       'video_date': DateTime.now(),
-    });
+    };
+    videoCollection
+        .doc("${path.basename(videoPath)}.${DateTime.now()}")
+        .set(data);
+    prefs.setString(path.basename(videoPath), jsonEncode(data));
   }
 
   Future<String> translateSrt(String srtData, String language) async {
@@ -289,19 +304,14 @@ for your loss.
   }
 
   void saveFile(String fileName, String data) async {
-    final directory = Directory("/storage/emulated/0/Download");
-    final file = File('${directory.path}/$fileName');
-    await file.writeAsString(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Subtitle downloaded successfully to Downloads folder',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-      ),
+    // final directory = Directory("/storage/emulated/0/Download");
+    // final file = File('${directory.path}/$fileName');
+    // await file.writeAsString(data);
+    notificationService.showLocalNotification(
+      'Subtitle downloaded successfully',
+      'Download/$fileName',
+      // file.path,
+      'download',
     );
   }
 
