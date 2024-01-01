@@ -99,7 +99,9 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryContainer: Color(0xffb0c4b1),
           shadow: Color(0xffb0c4b1).withOpacity(0.5),
-          secondaryContainer: Colors.white, // used to be 0.5 opacity
+          secondaryContainer: Colors.white,
+          tertiaryContainer: Colors.white,
+          secondary: const Color(0xffb0c4b1),
         ),
         dropdownMenuTheme: DropdownMenuThemeData(
           textStyle: TextStyle(
@@ -133,10 +135,10 @@ class MyApp extends StatelessWidget {
             fontSize: 50,
             fontStyle: FontStyle.normal,
             fontWeight: FontWeight.w300,
-            color: const Color(0xff4a5759),
+            color: Color.fromARGB(255, 0, 13, 54),
           ),
-          labelMedium: GoogleFonts.greatVibes(
-            fontSize: 30,
+          labelMedium: GoogleFonts.jost(
+            fontSize: 19,
             fontStyle: FontStyle.normal,
             fontWeight: FontWeight.w300,
             color: const Color(0xff4a5759),
@@ -173,13 +175,27 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+      darkTheme: ThemeData(
+        useMaterial3: true,
+      ).copyWith(
         platform: Theme.of(context).platform == TargetPlatform.android
             ? TargetPlatform.iOS
             : Theme.of(context).platform,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 57, 97, 132),
-            brightness: Brightness.dark),
+          seedColor: Color.fromARGB(255, 126, 9, 9),
+          brightness: Brightness.dark,
+          primaryContainer: Color.fromARGB(255, 78, 6, 6),
+          shadow: Color.fromARGB(255, 78, 6, 6).withOpacity(0.5),
+          secondaryContainer: Color.fromARGB(244, 214, 52, 41),
+          tertiaryContainer: Color.fromARGB(255, 109, 10, 3),
+          secondary: Color.fromARGB(255, 230, 102, 92),
+        ),
+        dropdownMenuTheme: DropdownMenuThemeData(
+          textStyle: TextStyle(
+            color: Color(0xffb0c4b1),
+            fontSize: 16,
+          ),
+        ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -203,18 +219,48 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: TextTheme(
           displayLarge: GoogleFonts.roboto(
-            fontSize: 42,
+            fontSize: 50,
             fontStyle: FontStyle.normal,
-            color: const Color.fromARGB(255, 57, 97, 132),
+            fontWeight: FontWeight.w300,
+            color: Color.fromARGB(255, 184, 125, 125),
           ),
-          // ···
+          labelMedium: GoogleFonts.jost(
+            fontSize: 19,
+            letterSpacing: 3,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w300,
+            color: Color.fromARGB(255, 184, 125, 125),
+          ),
+          headlineSmall: GoogleFonts.roboto(
+            fontSize: 19,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w300,
+            color: const Color.fromARGB(255, 184, 125, 125),
+          ),
           titleLarge: GoogleFonts.roboto(
             fontSize: 30,
             fontStyle: FontStyle.normal,
-            color: const Color.fromARGB(255, 57, 97, 132),
+            color: const Color(0xff4a5759),
           ),
           bodyMedium: GoogleFonts.merriweather(),
           displaySmall: GoogleFonts.pacifico(),
+          bodySmall: GoogleFonts.roboto(
+            fontSize: 16,
+            fontStyle: FontStyle.normal,
+            color: Color.fromARGB(255, 230, 192, 192),
+          ),
+        ),
+        scaffoldBackgroundColor: Color.fromARGB(255, 29, 0, 0),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 29, 0, 0),
+          // foregroundColor: Colors.black,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: GoogleFonts.oswald(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            color: const Color.fromARGB(255, 53, 37, 126),
+          ),
         ),
       ),
     );

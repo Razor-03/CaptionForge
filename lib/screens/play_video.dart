@@ -79,7 +79,8 @@ class _PlayVideoState extends State<PlayVideo> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     LoadingAnimationWidget.fourRotatingDots(
-                        color: Color(0xffb0c4b1), size: 50),
+                        color: Theme.of(context).colorScheme.secondary,
+                        size: 50),
                     Text(
                       progressString,
                       style: TextStyle(

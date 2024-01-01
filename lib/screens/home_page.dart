@@ -47,14 +47,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // const Icon(
             //   Icons.subtitles,
             //   size: 20,
             // ),
             Text(
-              'Caption Forge',
+              'CAPTION FORGE',
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ],
@@ -120,8 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             margin: const EdgeInsets.all(10),
             decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Theme.of(context).colorScheme.secondaryContainer,
+                Theme.of(context).colorScheme.tertiaryContainer,
+              ]),
               borderRadius: BorderRadius.circular(10),
-              color: Theme.of(context).colorScheme.secondaryContainer,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
