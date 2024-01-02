@@ -25,7 +25,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    notificationService.initNotifications();
   }
 
   @override

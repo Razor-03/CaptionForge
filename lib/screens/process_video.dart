@@ -77,7 +77,6 @@ class _ProcessVideoState extends State<ProcessVideo> {
       },
     );
 
-    notificationService.initNotifications();
     super.initState();
   }
 

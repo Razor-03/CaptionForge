@@ -48,9 +48,9 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       handleMessage(message);
     });
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((message) => handleMessage(message!));
+    // FirebaseMessaging.instance
+    //     .getInitialMessage()
+    //     .then((message) => handleMessage(message!));
 
     FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
 
@@ -91,6 +91,36 @@ class NotificationService {
         ),
       ),
       payload: payload,
+    );
+  }
+
+  Future<void> displayDownloadProgressNotification(double progress) async {
+    final int progressPercentage = (progress * 100).toInt();
+    final String notificationMessage = (progressPercentage < 100)
+        ? 'Download Progress: $progressPercentage%'
+        : 'Download Finished';
+    AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      _andriodChannel.id,
+      'Download Progress  ${progress.toInt() * 100}',
+      channelDescription: 'Shows download progress',
+      importance: Importance.high,
+      priority: Priority.high,
+      channelShowBadge: true,
+      onlyAlertOnce: true,
+      showProgress: true,
+      maxProgress: 100,
+      progress: progressPercentage,
+    );
+    NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await _localNotification.show(
+      0,
+      notificationMessage,
+      'Downloading Video',
+      platformChannelSpecifics,
+      payload: 'download_progress',
     );
   }
 }

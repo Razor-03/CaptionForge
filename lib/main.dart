@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:caption_forge/firebase_options.dart';
 import 'package:caption_forge/screens/home_page.dart';
+import 'package:caption_forge/utils/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,8 @@ void main() async {
     Permission.notification,
     Permission.storage,
   ].request();
+  NotificationService notificationService = NotificationService();
+  await notificationService.initNotifications();
 }
 
 Future<void> fetchAndStoreUserData() async {
