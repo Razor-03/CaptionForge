@@ -9,6 +9,7 @@ import 'package:caption_forge/screens/url_video.dart';
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/app_open_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caption_forge/screens/history.dart';
 
@@ -123,114 +124,116 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Text('Generate',
-                          style: Theme.of(context).textTheme.displayLarge),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                    child: Text('multilingual captions for your videos',
-                        style: Theme.of(context).textTheme.titleLarge),
-                  ),
-                ],
-              ),
-            ),
-            Ink(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context).colorScheme.primaryContainer,
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).colorScheme.shadow,
-                    blurRadius: 5,
-                    // offset: const Offset(0, 5),
-                    spreadRadius: 6,
-                  ),
-                ],
-                shape: BoxShape.rectangle,
-              ),
-              child: InkWell(
-                onTap: () {
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DeviceVideo(),
-                      ),
-                    );
-                  });
-                },
-                child: const ListTile(
-                  minVerticalPadding: 15,
-                  leading: Icon(Icons.ondemand_video),
-                  title: Text(
-                    'Upload Video From Device',
-                    style: TextStyle(height: 2),
-                  ),
-                  subtitle: Text(
-                    'Transcription by uploading video file from your mobile storage',
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text('Generate',
+                            style: Theme.of(context).textTheme.displayLarge),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                      child: Text('multilingual captions for your videos',
+                          style: Theme.of(context).textTheme.titleLarge),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Ink(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  Theme.of(context).colorScheme.secondaryContainer,
-                  Theme.of(context).colorScheme.tertiaryContainer,
-                ]),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    // offset: const Offset(0, 5),
-                    spreadRadius: 4,
-                  ),
-                ],
-                shape: BoxShape.rectangle,
-              ),
-              child: InkWell(
-                onTap: () {
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const UrlVideo(),
-                      ),
-                    );
-                  });
-                },
-                child: const ListTile(
-                  minVerticalPadding: 15,
-                  leading: Icon(Icons.link),
-                  title: Text(
-                    'Upload Video From URL',
-                    style: TextStyle(
-                      height: 2,
+              Ink(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.shadow,
+                      blurRadius: 5,
+                      // offset: const Offset(0, 5),
+                      spreadRadius: 6,
+                    ),
+                  ],
+                  shape: BoxShape.rectangle,
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DeviceVideo(),
+                        ),
+                      );
+                    });
+                  },
+                  child: const ListTile(
+                    minVerticalPadding: 15,
+                    leading: Icon(Icons.ondemand_video),
+                    title: Text(
+                      'Upload Video From Device',
+                      style: TextStyle(height: 2),
+                    ),
+                    subtitle: Text(
+                      'Transcription by uploading video file from your mobile storage',
                     ),
                   ),
-                  subtitle: Text(
-                    'Transcription by uploading video file from URL',
+                ),
+              ),
+              const SizedBox(height: 30),
+              Ink(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Theme.of(context).colorScheme.secondaryContainer,
+                    Theme.of(context).colorScheme.tertiaryContainer,
+                  ]),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      // offset: const Offset(0, 5),
+                      spreadRadius: 4,
+                    ),
+                  ],
+                  shape: BoxShape.rectangle,
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UrlVideo(),
+                        ),
+                      );
+                    });
+                  },
+                  child: const ListTile(
+                    minVerticalPadding: 15,
+                    leading: Icon(Icons.link),
+                    title: Text(
+                      'Upload Video From URL',
+                      style: TextStyle(
+                        height: 2,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Transcription by uploading video file from URL',
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-          ],
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),

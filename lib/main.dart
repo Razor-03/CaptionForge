@@ -46,8 +46,9 @@ void main() async {
 
   Map<Permission, PermissionStatus> statuses = await [
     Permission.location,
-    Permission.storage,
     Permission.camera,
+    Permission.notification,
+    Permission.storage,
   ].request();
 }
 
@@ -56,6 +57,7 @@ Future<void> fetchAndStoreUserData() async {
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
   debugPrint('Running on ${androidInfo.fingerprint}');
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  final fCMToken = await FirebaseMessaging.instance.getToken();
 
   try {
     final CollectionReference usersCollection =
@@ -66,6 +68,11 @@ Future<void> fetchAndStoreUserData() async {
         .get();
     if (document.exists) {
       debugPrint('User Exists');
+      await usersCollection
+          .doc(androidInfo.fingerprint.replaceAll('/', '|'))
+          .update({
+        'fcm_token': fCMToken,
+      });
       prefs.setString(
           'user',
           jsonEncode({
@@ -73,7 +80,6 @@ Future<void> fetchAndStoreUserData() async {
             'remaining_time': document['remaining_time'],
           }));
     } else {
-      final fCMToken = await FirebaseMessaging.instance.getToken();
       debugPrint('User Does Not Exist');
       prefs.setString(
           'user',
@@ -111,7 +117,7 @@ Future<void> fetchAndStoreAdsData() async {
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var data = jsonDecode(response.body);
-      // data['ad_active'] = false;
+      data['ad_active'] = false;
       prefs.setString('ad_settings', jsonEncode(data));
     } else {
       throw Exception('Failed to load ads');

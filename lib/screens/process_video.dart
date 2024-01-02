@@ -42,7 +42,7 @@ class _ProcessVideoState extends State<ProcessVideo> {
     loadAd().then(
       (value) {
         updateProgress('Generating subtitle');
-        return;
+        // return;
         _convertVideoToSrt().then(
           (subtitle) {
             if (subtitle == null) {
@@ -183,7 +183,7 @@ class _ProcessVideoState extends State<ProcessVideo> {
     await _convertVideoToAudio(widget.videoPath, tempAudioPath);
     debugPrint('Audio file converted: $tempAudioPath');
 
-    // var? srtData = await _sendAudioToOpenAI(tempAudioPath);
+    // String? srtData = await _sendAudioToOpenAI(tempAudioPath);
     // if (srtData == null) {
     //   return null;
     // }
