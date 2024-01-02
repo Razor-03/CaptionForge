@@ -5,6 +5,7 @@ import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/interstitial_ad.dart';
 import 'package:caption_forge/Widget/subtitle_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -20,6 +21,8 @@ class UrlVideo extends StatefulWidget {
 }
 
 class _UrlVideoState extends State<UrlVideo> {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   PlatformFile? videoFile;
   TextEditingController urlController = TextEditingController();
   var client = http.Client();
@@ -152,6 +155,11 @@ class _UrlVideoState extends State<UrlVideo> {
           receivedBytes += chunk.length;
           setState(() {
             downloadProgress = receivedBytes / contentLength;
+            displayDownloadProgressNotification(downloadProgress);
+            if (downloadProgress >= 1.0) {
+              // If the download is finished, you can perform additional actions here
+              debugPrint('Download Finished');
+            }
           });
         });
 
@@ -177,6 +185,36 @@ class _UrlVideoState extends State<UrlVideo> {
         downloadProgress = 0.0;
       });
     }
+  }
+
+  Future<void> displayDownloadProgressNotification(double progress) async {
+    final int progressPercentage = (progress * 100).toInt();
+    final String notificationMessage = (progressPercentage < 100)
+        ? 'Download Progress: $progressPercentage%'
+        : 'Download Finished';
+    AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'download_channel', // Use a unique channel ID
+      'Download Progress  ${progress.toInt() * 100}', // Channel name
+      channelDescription: 'Shows download progress', // Channel description
+      importance: Importance.high,
+      priority: Priority.high,
+      channelShowBadge: true,
+      onlyAlertOnce: true,
+      showProgress: true,
+      maxProgress: 100,
+      progress: progressPercentage,
+    );
+    NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      'Downloading Video', // Notification title
+      notificationMessage, // Notification body
+      platformChannelSpecifics,
+      payload: 'download_progress',
+    );
   }
 
   @override

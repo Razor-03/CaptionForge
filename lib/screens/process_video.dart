@@ -273,6 +273,7 @@ for your loss.
       var text = jsonDecode(response.body);
       return text;
     } on Exception catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }
