@@ -1,5 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+<<<<<<< HEAD
+=======
+import 'package:animated_text_kit/animated_text_kit.dart';
+>>>>>>> a8a428b3c5db443638ddcd13aa220786d0ce233b
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +19,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 

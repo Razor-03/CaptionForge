@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:caption_forge/Ads/native_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/notification_service.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +8,7 @@ import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
 
 class VideoPlayerScreen extends StatefulWidget {
-  VideoPlayerScreen(
+  const VideoPlayerScreen(
       {super.key, required this.videoPath, required this.subtitle});
 
   final String videoPath;
@@ -60,13 +63,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const NativeAdWidget(),
     );
   }
 
   void saveFile(String fileName, String data) async {
-    // final directory = Directory("/storage/emulated/0/Download");
-    // final file = File('${directory.path}/$fileName');
-    // await file.writeAsString(data);
+    final directory = Directory("/storage/emulated/0/Download");
+    final file = File('${directory.path}/$fileName');
+    await file.writeAsString(data);
     notificationService.showLocalNotification(
       'Subtitle downloaded successfully',
       'Download/$fileName',

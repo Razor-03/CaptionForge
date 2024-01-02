@@ -2,12 +2,9 @@ import 'dart:io';
 
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/reward_ad.dart';
-// import 'package:caption_forge/Ads/reward_ad.dart';
-import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/screens/play_video.dart';
 import 'package:caption_forge/utils/notification_service.dart';
 import 'package:caption_forge/utils/lang.dart';
-import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,7 +14,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'dart:convert';
@@ -38,27 +34,49 @@ class _ProcessVideoState extends State<ProcessVideo> {
   final client = http.Client();
   String progressString = '';
   var notificationService = NotificationService();
+  // late Future<void> niver;
 
   @override
   void initState() {
-    _convertVideoToSrt().then((subtitle) {
-      notificationService.showLocalNotification(
-        'Subtitle generated successfully',
-        null,
-        null,
-      );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => VideoPlayerScreen(
-            videoPath: widget.videoPath,
-            subtitle: subtitle,
-          ),
-        ),
-      );
-    }).catchError((error) {
-      debugPrint('Error: $error');
-    });
-    // loadAd();
+    updateProgress('Loading ad.....');
+    loadAd().then(
+      (value) {
+        updateProgress('Generating subtitle');
+        return;
+        _convertVideoToSrt().then(
+          (subtitle) {
+            if (subtitle == null) {
+              updateProgress('Failed to generate subtitle');
+              Future.delayed(const Duration(seconds: 2), () {
+                cancelProcess();
+                Navigator.of(context).pop();
+              });
+              return;
+            }
+            notificationService.showLocalNotification(
+              'Subtitle generated successfully',
+              null,
+              null,
+            );
+            // niver.then((value) =>
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => VideoPlayerScreen(
+                  videoPath: widget.videoPath,
+                  subtitle: subtitle,
+                ),
+              ),
+              // )
+            );
+          },
+        ).catchError(
+          (error) {
+            debugPrint('Error: $error');
+          },
+        );
+      },
+    );
+
     notificationService.initNotifications();
     super.initState();
   }
@@ -76,7 +94,11 @@ class _ProcessVideoState extends State<ProcessVideo> {
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['rewardAdmob'] && ads['ad_active']) {
-        loadRewardAd(adUnitId: ads['reward_adUnit']);
+        await loadRewardAd(adUnitId: ads['reward_adUnit']);
+        await rewardedAd?.show(
+            onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+          debugPrint('User earned reward: $reward');
+        });
       }
     }
   }
@@ -120,7 +142,7 @@ class _ProcessVideoState extends State<ProcessVideo> {
     );
   }
 
-  Future<String> _convertVideoToSrt() async {
+  Future<String?> _convertVideoToSrt() async {
     saveVideoDetails(widget.videoPath, widget.language);
 
     updateProgress('Searching for subtitle file...');
@@ -145,8 +167,12 @@ class _ProcessVideoState extends State<ProcessVideo> {
     if (transcribeFile.existsSync() && widget.language != 'Original') {
       var srtData = await translateSrt(
           transcribeFile.readAsStringSync(), widget.language);
-      await srtFile.writeAsString(srtData);
-      return srtData;
+      if (srtData != null) {
+        srtFile.writeAsStringSync(srtData);
+        return srtData;
+      } else {
+        return null;
+      }
     }
 
     debugPrint('Video file: ${widget.videoPath}');
@@ -157,9 +183,12 @@ class _ProcessVideoState extends State<ProcessVideo> {
     await _convertVideoToAudio(widget.videoPath, tempAudioPath);
     debugPrint('Audio file converted: $tempAudioPath');
 
-    // var srtData = await _sendAudioToOpenAI(tempAudioPath);
+    // var? srtData = await _sendAudioToOpenAI(tempAudioPath);
+    // if (srtData == null) {
+    //   return null;
+    // }
     File(tempAudioPath).deleteSync();
-    var srtData = """
+    String? srtData = """
 1
 00:00:00,000 --> 00:00:02,000
 Cognac?
@@ -189,53 +218,63 @@ for your loss.
 
     if (widget.language != "Original" && widget.language != "English") {
       srtData = await translateSrt(srtData, widget.language);
+      if (srtData == null) {
+        return null;
+      }
     }
 
     await srtFile.writeAsString(srtData);
-
     return srtData;
   }
 
   Future<void> saveVideoDetails(String videoPath, String language) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String user = prefs.getString('user') ?? '';
-    debugPrint('User: $user');
-    var userData = jsonDecode(user);
-    debugPrint('User Data: $userData');
-    final CollectionReference videoCollection = FirebaseFirestore.instance
-        .collection('User Info')
-        .doc(userData['id'])
-        .collection('Video Details');
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String user = prefs.getString('user') ?? '';
+      debugPrint('User: $user');
+      var userData = jsonDecode(user);
+      debugPrint('User Data: $userData');
+      final CollectionReference videoCollection = FirebaseFirestore.instance
+          .collection('User Info')
+          .doc(userData['id'])
+          .collection('Video Details');
 
-    final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
-    MediaInformation mediaInformation =
-        await flutterFFprobe.getMediaInformation(videoPath);
-    Map<dynamic, dynamic> mp = mediaInformation.getMediaProperties()!;
-    var data = {
-      'video_name': path.basename(videoPath),
-      'video_size': mp['size'],
-      'video_duration': mp['duration'],
-      'video_language': language,
-      'video_date': DateTime.now(),
-    };
-    await videoCollection
-        .doc("${path.basename(videoPath)}.${DateTime.now()}")
-        .set(data);
+      final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
+      MediaInformation mediaInformation =
+          await flutterFFprobe.getMediaInformation(videoPath);
+      Map<dynamic, dynamic> mp = mediaInformation.getMediaProperties()!;
+      var data = {
+        'video_name': path.basename(videoPath),
+        'video_size': mp['size'],
+        'video_duration': mp['duration'],
+        'video_language': language,
+        'video_date': DateTime.now(),
+      };
+      await videoCollection
+          .doc("${path.basename(videoPath)}.${DateTime.now()}")
+          .set(data);
+    } on Exception catch (e) {
+      debugPrint('Error: $e');
+    }
   }
 
-  Future<String> translateSrt(String srtData, String language) async {
+  Future<String?> translateSrt(String srtData, String language) async {
     updateProgress("Translating subtitle...");
-    var url = "https://kind-lime-lion-fez.cyclic.app/api/translate";
-    var response = await client.post(Uri.parse(url),
-        body: jsonEncode({
-          'text': srtData,
-          'lang': lang
-              .where((element) => element['language'] == language)
-              .first['code']
-        }),
-        headers: {'Content-Type': 'application/json'});
-    var text = jsonDecode(response.body);
-    return text;
+    try {
+      var url = "https://kind-lime-lion-fez.cyclic.app/api/translate";
+      var response = await client.post(Uri.parse(url),
+          body: jsonEncode({
+            'text': srtData,
+            'lang': lang
+                .where((element) => element['language'] == language)
+                .first['code']
+          }),
+          headers: {'Content-Type': 'application/json'});
+      var text = jsonDecode(response.body);
+      return text;
+    } on Exception catch (e) {
+      return null;
+    }
   }
 
   Future<void> _convertVideoToAudio(String inputPath, String outputPath) async {

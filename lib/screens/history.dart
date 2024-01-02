@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:caption_forge/Ads/banner_ad.dart';
+import 'package:caption_forge/Ads/interstitial_ad.dart';
 import 'package:caption_forge/screens/play_video.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,10 +17,25 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  final FlutterFFprobe flutterFFprobe = FlutterFFprobe();
+  @override
+  void initState() {
+    loadAd();
+    super.initState();
+  }
+
+  Future<void> loadAd() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String adSettings = prefs.getString('ad_settings') ?? '';
+    debugPrint('Ad Settings: $adSettings');
+    if (adSettings.isNotEmpty) {
+      var ads = jsonDecode(adSettings);
+      if (ads['interstritalAdmob'] && ads['ad_active']) {
+        loadInterstitialAd(adUnitId: ads['interstitial_adUnit']);
+      }
+    }
+  }
 
   Future<List<Map<String, dynamic>>> loadHistory() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     var tempDirectory = await getTemporaryDirectory();
     var videoDir = Directory('${tempDirectory.path}/file_picker');
     var subtitleDir = Directory('${tempDirectory.path}/subtitle');
@@ -32,8 +48,6 @@ class _HistoryState extends State<History> {
     if (subtitleDir.existsSync()) {
       subtitles = subtitleDir.listSync();
     }
-    print(videos);
-    print(subtitles);
     videos.removeWhere((element) {
       var videoName = path.basenameWithoutExtension(element.path);
       return !subtitles.any((element) {
@@ -50,34 +64,26 @@ class _HistoryState extends State<History> {
       });
     });
 
-    print(videos);
-    print(subtitles);
-
     List<Map<String, dynamic>> history = [];
-    subtitles.forEach(
-      (subtitle) {
-        print('Stared');
-        print(prefs.getKeys());
-        var video = videos.firstWhere((element) {
-          var videoName = path.basenameWithoutExtension(element.path);
-          var subtitleName = path.basenameWithoutExtension(subtitle.path);
-          return subtitleName.startsWith(videoName);
-        });
-        var name = path.basename(video.path);
-        history.add(
-          {
-            'name': name,
-            'video': video,
-            'subtitle': subtitle,
-            'size': (video.statSync().size / 1000000).toStringAsFixed(2),
-            'created_at': subtitle.statSync().changed,
-            'language':
-                path.basenameWithoutExtension(subtitle.path).split('.').last,
-          },
-        );
-      },
-    );
-    print(history);
+    for (var subtitle in subtitles) {
+      var video = videos.firstWhere((element) {
+        var videoName = path.basenameWithoutExtension(element.path);
+        var subtitleName = path.basenameWithoutExtension(subtitle.path);
+        return subtitleName.startsWith(videoName);
+      });
+      var name = path.basename(video.path);
+      history.add(
+        {
+          'name': name,
+          'video': video,
+          'subtitle': subtitle,
+          'size': (video.statSync().size / 1000000).toStringAsFixed(2),
+          'created_at': subtitle.statSync().changed,
+          'language':
+              path.basenameWithoutExtension(subtitle.path).split('.').last,
+        },
+      );
+    }
     history.sort((a, b) => b['created_at'].compareTo(a['created_at']));
     return history;
   }
@@ -132,6 +138,7 @@ class _HistoryState extends State<History> {
           }
         },
       ),
+      bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),
     );
   }
 }
