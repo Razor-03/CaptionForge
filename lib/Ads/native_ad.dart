@@ -29,27 +29,29 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
   }
 
   void loadNativeAd(String adUnitId) {
-    _nativeAd = NativeAd(
-      adUnitId: adUnitId,
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('$NativeAd loaded.');
-          setState(() {
-            _nativeAdIsLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // Dispose the ad here to free resources.
-          debugPrint('$NativeAd failed to load: $error');
-          ad.dispose();
-        },
-      ),
-      request: const AdRequest(),
-      // Styling
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.small,
-      ),
-    )..load();
+    setState(() {
+      _nativeAd = NativeAd(
+        adUnitId: adUnitId,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            debugPrint('$NativeAd loaded.');
+            setState(() {
+              _nativeAdIsLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            // Dispose the ad here to free resources.
+            debugPrint('$NativeAd failed to load: $error');
+            ad.dispose();
+          },
+        ),
+        request: const AdRequest(),
+        // Styling
+        nativeTemplateStyle: NativeTemplateStyle(
+          templateType: TemplateType.small,
+        ),
+      )..load();
+    });
   }
 
   @override
@@ -64,11 +66,11 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
         ? ConstrainedBox(
             constraints: const BoxConstraints(
               minWidth: 320, // minimum recommended width
-              minHeight: 90, // minimum recommended height
+              minHeight: 50, // minimum recommended height
               maxWidth: 400,
               maxHeight: 200,
             ),
-            child: AdWidget(key: UniqueKey(), ad: _nativeAd!),
+            child: AdWidget(ad: _nativeAd!),
           )
         : Container();
   }

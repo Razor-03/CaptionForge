@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:caption_forge/screens/play_video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -53,31 +54,31 @@ class _HistoryState extends State<History> {
     print(subtitles);
 
     List<Map<String, dynamic>> history = [];
-    subtitles.forEach((subtitle) {
-      print('Stared');
-      var video = videos.firstWhere((element) {
-        var videoName = path.basenameWithoutExtension(element.path);
-        var subtitleName = path.basenameWithoutExtension(subtitle.path);
-        return subtitleName.startsWith(videoName);
-      });
-      var name = path.basename(video.path);
-      // flutterFFprobe.getMediaInformation(video.path).then((mediaInformation) {
-      //   Map<dynamic, dynamic> mp = mediaInformation.getMediaProperties();
-      var data = jsonDecode(prefs.getString(name)?? '');
-      print(data);
-      history.add({
-        'name': name,
-        'video': video,
-        'subtitle': subtitle,
-        'duration': data['video_duration'] ?? 0,
-        'size': video.statSync().size,
-        'created_at': subtitle.statSync().changed,
-        'language':
-            path.basenameWithoutExtension(subtitle.path).split('.').last,
-      });
-      // });
-    });
+    subtitles.forEach(
+      (subtitle) {
+        print('Stared');
+        print(prefs.getKeys());
+        var video = videos.firstWhere((element) {
+          var videoName = path.basenameWithoutExtension(element.path);
+          var subtitleName = path.basenameWithoutExtension(subtitle.path);
+          return subtitleName.startsWith(videoName);
+        });
+        var name = path.basename(video.path);
+        history.add(
+          {
+            'name': name,
+            'video': video,
+            'subtitle': subtitle,
+            'size': (video.statSync().size / 1000000).toStringAsFixed(2),
+            'created_at': subtitle.statSync().changed,
+            'language':
+                path.basenameWithoutExtension(subtitle.path).split('.').last,
+          },
+        );
+      },
+    );
     print(history);
+    history.sort((a, b) => b['created_at'].compareTo(a['created_at']));
     return history;
   }
 
@@ -91,14 +92,35 @@ class _HistoryState extends State<History> {
         future: loadHistory(),
         builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return const Center(child: Text('No History'));
+            }
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 var history = snapshot.data![index];
+                DateTime createdAt = history['created_at'];
                 return ListTile(
-                  title: Text(history['name']),
-                  subtitle: Text(history['language']),
-                  trailing: Text(history['duration'].toString()),
+                  onTap: () {
+                    File subtitleFile = File(history['subtitle'].path);
+                    String subtitleData = subtitleFile.readAsStringSync();
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => VideoPlayerScreen(
+                          videoPath: history['video'].path,
+                          subtitle: subtitleData),
+                    ));
+                  },
+                  title: Text(
+                    history['name'],
+                    textAlign: TextAlign.center,
+                  ),
+                  subtitle:
+                      Text(history['language'], textAlign: TextAlign.center),
+                  trailing: Text('${history['size']} MB'),
+                  leading: Text(
+                    '${createdAt.day}/${createdAt.month}/${createdAt.year}\n${createdAt.hour}:${createdAt.minute}:${createdAt.second}',
+                    textAlign: TextAlign.center,
+                  ),
                 );
               },
             );

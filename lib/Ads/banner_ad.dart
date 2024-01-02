@@ -19,15 +19,17 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      String adSettings = prefs.getString('ad_settings') ?? '';
-      if (adSettings.isNotEmpty) {
-        var ads = jsonDecode(adSettings);
-        if (ads['bannerAdmob'] && ads['ad_active']) {
-          _loadBannerAd(ads['banner_adUnit']);
+    SharedPreferences.getInstance().then(
+      (prefs) {
+        String adSettings = prefs.getString('ad_settings') ?? '';
+        if (adSettings.isNotEmpty) {
+          var ads = jsonDecode(adSettings);
+          if (ads['bannerAdmob'] && ads['ad_active']) {
+            _loadBannerAd(ads['banner_adUnit']);
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   void _loadBannerAd(String adUnitId) {

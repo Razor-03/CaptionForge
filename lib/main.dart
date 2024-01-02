@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:caption_forge/firebase_options.dart';
 import 'package:caption_forge/screens/history.dart';
@@ -28,6 +29,18 @@ void main() async {
   debugPrint("Temporary Directory: ${dir.path}");
   for (var file in dir.listSync()) {
     debugPrint("File: ${file.path}");
+  }
+  var eng = Directory('${dir.path}/transcribe');
+  for (var file in eng.listSync()) {
+    debugPrint("transcribe: ${file.path}");
+  }
+  var sub = Directory('${dir.path}/subtitle');
+  for (var file in sub.listSync()) {
+    debugPrint("subtitle: ${file.path}");
+  }
+  var file = Directory('${dir.path}/file_picker');
+  for (var file in file.listSync()) {
+    debugPrint("video: ${file.path}");
   }
 
   runApp(const MyApp());
@@ -95,7 +108,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage(),
+      home: const MyHomePage() ,
       theme: ThemeData(
         useMaterial3: true,
       ).copyWith(
