@@ -66,12 +66,15 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
         ? ConstrainedBox(
             constraints: const BoxConstraints(
               minWidth: 320, // minimum recommended width
-              minHeight: 50, // minimum recommended height
+              minHeight: 30, // minimum recommended height
               maxWidth: 400,
-              maxHeight: 200,
+              maxHeight: 100,
             ),
             child: AdWidget(ad: _nativeAd!),
           )
-        : Container();
+        : const SizedBox(
+            width: 0,
+            height: 0,
+          );
   }
 }

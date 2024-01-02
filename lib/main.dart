@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:caption_forge/firebase_options.dart';
-import 'package:caption_forge/screens/history.dart';
 import 'package:caption_forge/screens/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
@@ -30,58 +29,78 @@ void main() async {
   for (var file in dir.listSync()) {
     debugPrint("File: ${file.path}");
   }
-  var eng = Directory('${dir.path}/transcribe');
-  for (var file in eng.listSync()) {
-    debugPrint("transcribe: ${file.path}");
-  }
-  var sub = Directory('${dir.path}/subtitle');
-  for (var file in sub.listSync()) {
-    debugPrint("subtitle: ${file.path}");
-  }
-  var file = Directory('${dir.path}/file_picker');
-  for (var file in file.listSync()) {
-    debugPrint("video: ${file.path}");
-  }
+  // var eng = Directory('${dir.path}/transcribe');
+  // for (var file in eng.listSync()) {
+  //   debugPrint("transcribe: ${file.path}");
+  // }
+  // var sub = Directory('${dir.path}/subtitle');
+  // for (var file in sub.listSync()) {
+  //   debugPrint("subtitle: ${file.path}");
+  // }
+  // var file = Directory('${dir.path}/file_picker');
+  // for (var file in file.listSync()) {
+  //   debugPrint("video: ${file.path}");
+  // }
 
   runApp(const MyApp());
+
+  Map<Permission, PermissionStatus> statuses = await [
+    Permission.location,
+    Permission.storage,
+    Permission.camera,
+  ].request();
 }
 
 Future<void> fetchAndStoreUserData() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
   debugPrint('Running on ${androidInfo.fingerprint}');
-
-  final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('User Info');
-
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  DocumentSnapshot document = await usersCollection
-      .doc(androidInfo.fingerprint.replaceAll('/', '|'))
-      .get();
-  if (document.exists) {
-    debugPrint('User Exists');
+
+  try {
+    final CollectionReference usersCollection =
+        FirebaseFirestore.instance.collection('User Info');
+
+    DocumentSnapshot document = await usersCollection
+        .doc(androidInfo.fingerprint.replaceAll('/', '|'))
+        .get();
+    if (document.exists) {
+      debugPrint('User Exists');
+      prefs.setString(
+          'user',
+          jsonEncode({
+            'id': androidInfo.fingerprint.replaceAll('/', '|'),
+            'remaining_time': document['remaining_time'],
+          }));
+    } else {
+      final fCMToken = await FirebaseMessaging.instance.getToken();
+      debugPrint('User Does Not Exist');
+      prefs.setString(
+          'user',
+          jsonEncode({
+            'id': androidInfo.fingerprint.replaceAll('/', '|'),
+            'remaining_time': 30,
+          }));
+
+      await usersCollection
+          .doc(androidInfo.fingerprint.replaceAll('/', '|'))
+          .set({
+        'remaining_time': 30,
+        'fcm_token': fCMToken,
+      });
+    }
+  } catch (e) {
+    debugPrint('Error: $e');
+  } finally {
     prefs.setString(
-        'user',
-        jsonEncode({
-          'id': androidInfo.fingerprint.replaceAll('/', '|'),
-          'remaining_time': document['remaining_time'],
-        }));
-  } else {
-    final fCMToken = await FirebaseMessaging.instance.getToken();
-    debugPrint('User Does Not Exist');
-    prefs.setString(
-        'user',
-        jsonEncode({
+      'user',
+      jsonEncode(
+        {
           'id': androidInfo.fingerprint.replaceAll('/', '|'),
           'remaining_time': 30,
-        }));
-
-    await usersCollection
-        .doc(androidInfo.fingerprint.replaceAll('/', '|'))
-        .set({
-      'remaining_time': 30,
-      'fcm_token': fCMToken,
-    });
+        },
+      ),
+    );
   }
 }
 
@@ -92,10 +111,10 @@ Future<void> fetchAndStoreAdsData() async {
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var data = jsonDecode(response.body);
-      data['ad_active'] = false;
-      prefs.setString('ad_settings', response.body);
+      // data['ad_active'] = false;
+      prefs.setString('ad_settings', jsonEncode(data));
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load ads');
     }
   } catch (e) {
     debugPrint('Error: $e');
@@ -108,7 +127,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage() ,
+      home: const MyHomePage(),
       theme: ThemeData(
         useMaterial3: true,
       ).copyWith(

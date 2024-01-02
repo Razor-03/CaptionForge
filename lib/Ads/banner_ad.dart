@@ -72,6 +72,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
               ad: _bannerAd!,
             ),
           )
-        : Container();
+        : const SizedBox(
+            width: double.infinity,
+            height: 10,
+        );
   }
 }

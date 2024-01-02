@@ -5,16 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-  print("Tile: ${message.notification!.title}");
-  print("Body: ${message.notification!.body}");
-  print("Data: ${message.data}");
+  // print("Tile: ${message.notification!.title}");
+  // print("Body: ${message.notification!.body}");
+  // print("Data: ${message.data}");
 }
 
 void handleMessage(RemoteMessage message) {
   if (message.notification == null) return;
-  print("Tile: ${message.notification!.title}");
-  print(
-      '((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))');
 }
 
 class NotificationService {
@@ -39,8 +36,6 @@ class NotificationService {
       provisional: false,
       sound: true,
     );
-    final fCMToken = await FirebaseMessaging.instance.getToken();
-    print("FCM Token: $fCMToken");
     await initPushNotification();
     await initLocalNotification();
   }
