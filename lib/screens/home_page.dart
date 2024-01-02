@@ -1,11 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-<<<<<<< HEAD
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:caption_forge/Ads/interstitial_ad.dart';
-import 'package:caption_forge/Ads/reward_ad.dart';
-=======
->>>>>>> abe4e51b1abcfac990ff845898b34fb9d77b5b91
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
