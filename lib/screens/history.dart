@@ -86,7 +86,10 @@ class _HistoryState extends State<History> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
+        title: Text(
+          'History',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
       ),
       body: FutureBuilder(
         future: loadHistory(),

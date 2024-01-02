@@ -17,7 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-<<<<<<< HEAD
   animated_text_kit:
     dependency: "direct main"
     description:
@@ -26,7 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.2"
-=======
   archive:
     dependency: transitive
     description:
@@ -35,7 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.9"
->>>>>>> abe4e51b1abcfac990ff845898b34fb9d77b5b91
   args:
     dependency: transitive
     description:

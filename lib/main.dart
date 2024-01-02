@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,22 +28,46 @@ void main() async {
   debugPrint("User Data Fetched");
   var dir = await getTemporaryDirectory();
   debugPrint("Temporary Directory: ${dir.path}");
-  for (var file in dir.listSync()) {
-    debugPrint("File: ${file.path}");
-  }
-  var eng = Directory('${dir.path}/transcribe');
-  for (var file in eng.listSync()) {
-    debugPrint("transcribe: ${file.path}");
-  }
-  var sub = Directory('${dir.path}/subtitle');
-  for (var file in sub.listSync()) {
-    debugPrint("subtitle: ${file.path}");
-  }
-  var file = Directory('${dir.path}/file_picker');
-  for (var file in file.listSync()) {
-    debugPrint("video: ${file.path}");
-  }
+  if (dir.existsSync()) {
+    debugPrint("Directory Exists");
 
+    // List files in the 'transcribe' directory
+    var eng = Directory('${dir.path}/transcribe');
+    if (eng.existsSync()) {
+      debugPrint("Files in transcribe:");
+      for (var file in eng.listSync()) {
+        debugPrint("transcribe: ${file.path}");
+      }
+    } else {
+      debugPrint("Transcribe Directory Does Not Exist");
+    }
+
+    // List files in the 'subtitle' directory
+    var sub = Directory('${dir.path}/subtitle');
+    if (sub.existsSync()) {
+      debugPrint("Files in subtitle:");
+      for (var file in sub.listSync()) {
+        debugPrint("subtitle: ${file.path}");
+      }
+    } else {
+      debugPrint("Subtitle Directory Does Not Exist");
+    }
+
+    // List files in the 'file_picker' directory
+    var filePicker = Directory('${dir.path}/file_picker');
+    print(
+        "******************************************${filePicker.path}**************************************************");
+    if (filePicker.existsSync()) {
+      debugPrint("Files in file_picker:");
+      for (var file in filePicker.listSync()) {
+        debugPrint("video: ${file.path}");
+      }
+    } else {
+      debugPrint("File Picker Directory Does Not Exist");
+    }
+  } else {
+    debugPrint("Main Directory Does Not Exist");
+  }
   runApp(const MyApp());
 }
 
@@ -108,7 +133,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage() ,
+      home: const MyHomePage(),
       theme: ThemeData(
         useMaterial3: true,
       ).copyWith(
