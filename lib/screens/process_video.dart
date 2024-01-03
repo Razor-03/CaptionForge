@@ -280,10 +280,20 @@ for your loss.
   Future<void> _convertVideoToAudio(String inputPath, String outputPath) async {
     updateProgress("Converting video to audio...");
     debugPrint('Converting video to audio...');
-    String command =
-        '-i $inputPath -vn -ar 44100 -ac 2 -c:a aac -b:a 192k $outputPath';
-
-    int result = await _flutterFFmpeg.execute(command);
+    int result = await _flutterFFmpeg.executeWithArguments([
+      '-i',
+      inputPath,
+      '-vn',
+      '-ar',
+      '44100',
+      '-ac',
+      '2',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '192k',
+      outputPath
+    ]);
     if (result == 0) {
       debugPrint('Conversion successful');
     } else {

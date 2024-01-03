@@ -63,7 +63,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     await file.writeAsString(data);
     notificationService.showLocalNotification(
       'Subtitle Saved Successfully',
-      'Download/$fileName',
+      'CaptionForge/$fileName',
       null,
     );
   }
@@ -86,7 +86,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     subtitleFile.deleteSync();
     notificationService.showLocalNotification(
       'Video Saved Successfully',
-      'Download/${path.basename(videoPath)}',
+      'CaptionForge/${path.basename(videoPath)}',
       null,
     );
   }
