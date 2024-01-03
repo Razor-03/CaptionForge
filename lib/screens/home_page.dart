@@ -109,14 +109,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // const Icon(
-            //   Icons.subtitles,
-            //   size: 20,
-            // ),
             Text(
               'CAPTION FORGE',
               style: Theme.of(context).textTheme.labelMedium,
             ),
+            const SizedBox(width: 50),
           ],
         ),
       ),
@@ -150,8 +147,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Ink(
                 decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Theme.of(context).colorScheme.tertiaryContainer,
+                    Theme.of(context).colorScheme.secondaryContainer,
+                  ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  // color: Theme.of(context).colorScheme.primaryContainer,
                   boxShadow: [
                     BoxShadow(
                       color: Theme.of(context).colorScheme.shadow,
@@ -192,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   gradient: LinearGradient(colors: [
                     Theme.of(context).colorScheme.secondaryContainer,
                     Theme.of(context).colorScheme.tertiaryContainer,
-                  ]),
+                  ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(

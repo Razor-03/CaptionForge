@@ -23,63 +23,6 @@ void main() async {
   debugPrint("Ads Data Fetched");
   await fetchAndStoreUserData();
   debugPrint("User Data Fetched");
-  // var dir = await getTemporaryDirectory();
-  // debugPrint("Temporary Directory: ${dir.path}");
-  // if (dir.existsSync()) {
-  //   debugPrint("Directory Exists");
-  //   for (var file in dir.listSync()) {
-  //     debugPrint("File: ${file.path}");
-  //   }
-  // var eng = Directory('${dir.path}/transcribe');
-  // for (var file in eng.listSync()) {
-  //   debugPrint("transcribe: ${file.path}");
-  // }
-  // var sub = Directory('${dir.path}/subtitle');
-  // for (var file in sub.listSync()) {
-  //   debugPrint("subtitle: ${file.path}");
-  // }
-  // var file = Directory('${dir.path}/file_picker');
-  // for (var file in file.listSync()) {
-  //   debugPrint("video: ${file.path}");
-  // }
-
-  //   // List files in the 'transcribe' directory
-  //   var eng = Directory('${dir.path}/transcribe');
-  //   if (eng.existsSync()) {
-  //     debugPrint("Files in transcribe:");
-  //     for (var file in eng.listSync()) {
-  //       debugPrint("transcribe: ${file.path}");
-  //     }
-  //   } else {
-  //     debugPrint("Transcribe Directory Does Not Exist");
-  //   }
-
-  //   // List files in the 'subtitle' directory
-  //   var sub = Directory('${dir.path}/subtitle');
-  //   if (sub.existsSync()) {
-  //     debugPrint("Files in subtitle:");
-  //     for (var file in sub.listSync()) {
-  //       debugPrint("subtitle: ${file.path}");
-  //     }
-  //   } else {
-  //     debugPrint("Subtitle Directory Does Not Exist");
-  //   }
-
-  //   // List files in the 'file_picker' directory
-  //   var filePicker = Directory('${dir.path}/file_picker');
-  //   print(
-  //       "******************************************${filePicker.path}**************************************************");
-  //   if (filePicker.existsSync()) {
-  //     debugPrint("Files in file_picker:");
-  //     for (var file in filePicker.listSync()) {
-  //       debugPrint("video: ${file.path}");
-  //     }
-  //   } else {
-  //     debugPrint("File Picker Directory Does Not Exist");
-  //   }
-  // } else {
-  //   debugPrint("Main Directory Does Not Exist");
-  // }
   runApp(const MyApp());
   await [
     Permission.location,
@@ -180,12 +123,12 @@ class MyApp extends StatelessWidget {
             ? TargetPlatform.iOS
             : Theme.of(context).platform,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xffb0c4b1),
+          seedColor: const Color.fromARGB(255, 176, 196, 189),
           brightness: Brightness.light,
-          primaryContainer: const Color(0xffb0c4b1),
+          primaryContainer: const Color.fromARGB(255, 176, 196, 179),
           shadow: const Color(0xffb0c4b1).withOpacity(0.5),
-          secondaryContainer: Colors.white,
-          tertiaryContainer: Colors.white,
+          secondaryContainer: const Color.fromARGB(255, 168, 227, 221),
+          tertiaryContainer: const Color.fromARGB(255, 131, 171, 164),
           secondary: const Color(0xffb0c4b1),
         ),
         dropdownMenuTheme: const DropdownMenuThemeData(
@@ -247,9 +190,9 @@ class MyApp extends StatelessWidget {
             color: const Color(0xff4a5759),
           ),
         ),
-        scaffoldBackgroundColor: const Color(0xffdedbd2),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 228, 234, 234),
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color(0xffdedbd2),
+          backgroundColor: const Color.fromARGB(255, 206, 217, 215),
           // foregroundColor: Colors.black,
           elevation: 0,
           centerTitle: true,
@@ -271,8 +214,8 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           primaryContainer: const Color.fromARGB(255, 78, 6, 6),
           shadow: const Color.fromARGB(255, 78, 6, 6).withOpacity(0.5),
-          secondaryContainer: const Color.fromARGB(244, 214, 52, 41),
-          tertiaryContainer: const Color.fromARGB(255, 109, 10, 3),
+          secondaryContainer: Color.fromARGB(244, 157, 43, 35),
+          tertiaryContainer: Color.fromARGB(255, 90, 10, 4),
           secondary: const Color.fromARGB(255, 230, 102, 92),
         ),
         dropdownMenuTheme: const DropdownMenuThemeData(
@@ -337,7 +280,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 29, 0, 0),
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color.fromARGB(255, 29, 0, 0),
+          backgroundColor: const Color.fromARGB(255, 52, 11, 11),
           // foregroundColor: Colors.black,
           elevation: 0,
           centerTitle: true,

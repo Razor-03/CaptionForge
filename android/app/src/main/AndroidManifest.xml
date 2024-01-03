@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <application
-        android:label="caption_forge"
+        android:label="Caption Forge"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

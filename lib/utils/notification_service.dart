@@ -68,7 +68,7 @@ class NotificationService {
   Future initLocalNotification() async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
-            android: AndroidInitializationSettings("@drawable/ic_launcher"));
+            android: AndroidInitializationSettings("@mipmap/launcher_icon"));
     await _localNotification.initialize(
       initializationSettings,
     );
@@ -87,7 +87,7 @@ class NotificationService {
           importance: _andriodChannel.importance,
           color: Colors.blue,
           playSound: true,
-          icon: "@drawable/ic_launcher",
+          icon: "@mipmap/launcher_icon",
         ),
       ),
       payload: payload,
