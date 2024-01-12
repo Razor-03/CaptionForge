@@ -182,33 +182,12 @@ class _ProcessVideoState extends State<ProcessVideo> {
     await _convertVideoToAudio(widget.videoPath, tempAudioPath);
     debugPrint('Audio file converted: $tempAudioPath');
 
-    // String? srtData = await _sendAudioToOpenAI(tempAudioPath);
-    // if (srtData == null) {
-    //   return null;
-    // }
+    String? srtData = await _sendAudioToOpenAI(tempAudioPath);
+    if (srtData == null) {
+      return null;
+    }
     File(tempAudioPath).deleteSync();
-    String? srtData = """
-1
-00:00:00,000 --> 00:00:02,000
-Cognac?
-
-2
-00:00:02,000 --> 00:00:04,000
-No, thank you.
-
-3
-00:00:04,000 --> 00:00:06,000
-Listen, I'm...
-
-4
-00:00:06,000 --> 00:00:08,000
-sorry...
-
-5
-00:00:08,000 --> 00:00:10,000
-for your loss.
-
-""";
+   
     debugPrint(srtData);
 
     if (widget.language != 'Original') {
