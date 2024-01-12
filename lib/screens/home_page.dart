@@ -10,6 +10,7 @@ import 'package:caption_forge/Ads/app_open_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:caption_forge/screens/history.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -27,6 +28,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     loadAd();
+    [
+      Permission.notification,
+      Permission.storage,
+      Permission.manageExternalStorage,      
+    ].request();
     super.initState();
   }
 

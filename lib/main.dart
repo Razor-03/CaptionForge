@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
@@ -29,11 +28,7 @@ void main() async {
     debugPrint('Error: $e');
   }
   runApp(const MyApp());
-  await [
-    Permission.notification,
-    Permission.storage,
-    Permission.photos,
-  ].request();
+
   NotificationService notificationService = NotificationService();
   await notificationService.initNotifications();
 }
@@ -54,26 +49,13 @@ Future<void> fetchAndStoreUserData() async {
         .get();
     if (document.exists) {
       debugPrint('User Exists');
-      await usersCollection
+      usersCollection
           .doc(androidInfo.fingerprint.replaceAll('/', '|'))
           .update({
         'fcm_token': fCMToken,
       });
-      prefs.setString(
-          'user',
-          jsonEncode({
-            'id': androidInfo.fingerprint.replaceAll('/', '|'),
-            'remaining_time': document['remaining_time'],
-          }));
     } else {
       debugPrint('User Does Not Exist');
-      prefs.setString(
-          'user',
-          jsonEncode({
-            'id': androidInfo.fingerprint.replaceAll('/', '|'),
-            'remaining_time': 30,
-          }));
-
       await usersCollection
           .doc(androidInfo.fingerprint.replaceAll('/', '|'))
           .set({

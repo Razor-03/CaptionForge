@@ -1,9 +1,10 @@
 import 'dart:io';
-import 'package:caption_forge/Ads/native_ad.dart';
+import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Widget/video_player_view.dart';
 import 'package:caption_forge/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path/path.dart' as path;
@@ -50,7 +51,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const NativeAdWidget(),
+      bottomNavigationBar: const BannerAdWidget(adSize: AdSize.banner),
     );
   }
 

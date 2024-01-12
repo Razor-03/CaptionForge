@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:caption_forge/Ads/banner_ad.dart';
 import 'package:caption_forge/Ads/reward_ad.dart';
 import 'package:caption_forge/screens/play_video.dart';
@@ -34,15 +33,12 @@ class _ProcessVideoState extends State<ProcessVideo> {
   final client = http.Client();
   String progressString = '';
   var notificationService = NotificationService();
-  // late Future<void> niver;
 
   @override
   void initState() {
     updateProgress('Loading ad.....');
     loadAd().then(
-      (value) {
-        updateProgress('Generating subtitle');
-        // return;
+      (_) {
         _convertVideoToSrt().then(
           (subtitle) {
             if (subtitle == null) {
@@ -58,7 +54,6 @@ class _ProcessVideoState extends State<ProcessVideo> {
               null,
               null,
             );
-            // niver.then((value) =>
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => VideoPlayerScreen(
@@ -66,7 +61,6 @@ class _ProcessVideoState extends State<ProcessVideo> {
                   subtitle: subtitle,
                 ),
               ),
-              // )
             );
           },
         ).catchError(
@@ -76,7 +70,6 @@ class _ProcessVideoState extends State<ProcessVideo> {
         );
       },
     );
-
     super.initState();
   }
 
@@ -87,14 +80,15 @@ class _ProcessVideoState extends State<ProcessVideo> {
   }
 
   Future<void> loadAd() async {
+    var rewardAd = Reward();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String adSettings = prefs.getString('ad_settings') ?? '';
     debugPrint('Ad Settings: $adSettings');
     if (adSettings.isNotEmpty) {
       var ads = jsonDecode(adSettings);
       if (ads['rewardAdmob'] && ads['ad_active']) {
-        await loadRewardAd(adUnitId: ads['reward_adUnit']);
-        await rewardedAd?.show(
+        await rewardAd.loadRewardAd(adUnitId: ads['reward_adUnit']);
+        await rewardAd.rewardedAd?.show(
             onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
           debugPrint('User earned reward: $reward');
         });
@@ -187,7 +181,7 @@ class _ProcessVideoState extends State<ProcessVideo> {
       return null;
     }
     File(tempAudioPath).deleteSync();
-   
+
     debugPrint(srtData);
 
     if (widget.language != 'Original') {
@@ -270,7 +264,7 @@ class _ProcessVideoState extends State<ProcessVideo> {
       '-c:a',
       'aac',
       '-b:a',
-      '192k',
+      '64k',
       outputPath
     ]);
     if (result == 0) {
