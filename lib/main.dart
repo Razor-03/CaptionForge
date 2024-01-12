@@ -17,18 +17,22 @@ import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await dotenv.load(fileName: ".env");
-  await fetchAndStoreAdsData();
-  debugPrint("Ads Data Fetched");
-  await fetchAndStoreUserData();
-  debugPrint("User Data Fetched");
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    await dotenv.load(fileName: ".env");
+    await fetchAndStoreAdsData();
+    debugPrint("Ads Data Fetched");
+    await fetchAndStoreUserData();
+    debugPrint("User Data Fetched");
+  } on Exception catch (e) {
+    debugPrint('Error: $e');
+  }
   runApp(const MyApp());
   await [
-    Permission.location,
-    Permission.camera,
     Permission.notification,
     Permission.storage,
+    Permission.photos,
   ].request();
   NotificationService notificationService = NotificationService();
   await notificationService.initNotifications();
@@ -99,7 +103,7 @@ Future<void> fetchAndStoreAdsData() async {
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var data = jsonDecode(response.body);
-      data['ad_active'] = false;
+      // data['ad_active'] = false;
       prefs.setString('ad_settings', jsonEncode(data));
     } else {
       throw Exception('Failed to load ads');
@@ -214,8 +218,8 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           primaryContainer: const Color.fromARGB(255, 78, 6, 6),
           shadow: const Color.fromARGB(255, 78, 6, 6).withOpacity(0.5),
-          secondaryContainer: Color.fromARGB(244, 157, 43, 35),
-          tertiaryContainer: Color.fromARGB(255, 90, 10, 4),
+          secondaryContainer: const Color.fromARGB(244, 157, 43, 35),
+          tertiaryContainer: const Color.fromARGB(255, 90, 10, 4),
           secondary: const Color.fromARGB(255, 230, 102, 92),
         ),
         dropdownMenuTheme: const DropdownMenuThemeData(
